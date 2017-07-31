@@ -3,7 +3,7 @@ module OpenSolid.Curve3d
         ( arc
         , cubicSpline
         , lineSegment
-        , point
+        , pointOn
         , projectOnto
         , quadraticSpline
         )
@@ -33,9 +33,9 @@ quadraticSpline =
     Implementation.QuadraticSpline3dCurve
 
 
-point : Curve3d -> Float -> Point3d
-point =
-    Implementation.curve3dPoint
+pointOn : Curve3d -> Float -> Point3d
+pointOn =
+    Implementation.curve3dPointOn
 
 
 projectOnto : Plane3d -> Curve3d -> Curve3d

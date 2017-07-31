@@ -4,7 +4,7 @@ module OpenSolid.Curve2d
         , cubicSpline
         , lineSegment
         , placeOnto
-        , point
+        , pointOn
         , quadraticSpline
         )
 
@@ -33,9 +33,9 @@ quadraticSpline =
     Implementation.QuadraticSpline2dCurve
 
 
-point : Curve2d -> Float -> Point2d
-point =
-    Implementation.curve2dPoint
+pointOn : Curve2d -> Float -> Point2d
+pointOn =
+    Implementation.curve2dPointOn
 
 
 placeOnto : SketchPlane3d -> Curve2d -> Curve3d

@@ -30,8 +30,8 @@ type Curve3d
     | ProjectedCurve3d Curve3d Plane3d
 
 
-curve2dPoint : Curve2d -> Float -> Point2d
-curve2dPoint curve2d =
+curve2dPointOn : Curve2d -> Float -> Point2d
+curve2dPointOn curve2d =
     case curve2d of
         LineSegment2dCurve lineSegment2d ->
             LineSegment2d.interpolate lineSegment2d
@@ -46,7 +46,7 @@ curve2dPoint curve2d =
             CubicSpline2d.point cubicSpline2d
 
         ProjectedCurve2d curve3d sketchPlane ->
-            curve3dPoint curve3d >> Point3d.projectInto sketchPlane
+            curve3dPointOn curve3d >> Point3d.projectInto sketchPlane
 
 
 curve2dPlaceOnto : SketchPlane3d -> Curve2d -> Curve3d
@@ -75,8 +75,8 @@ curve2dPlaceOnto sketchPlane curve2d =
                 PlacedCurve3d curve2d sketchPlane
 
 
-curve3dPoint : Curve3d -> Float -> Point3d
-curve3dPoint curve3d =
+curve3dPointOn : Curve3d -> Float -> Point3d
+curve3dPointOn curve3d =
     case curve3d of
         LineSegment3dCurve lineSegment3d ->
             LineSegment3d.interpolate lineSegment3d
@@ -91,10 +91,10 @@ curve3dPoint curve3d =
             CubicSpline3d.point cubicSpline3d
 
         PlacedCurve3d curve2d sketchPlane ->
-            curve2dPoint curve2d >> Point2d.placeOnto sketchPlane
+            curve2dPointOn curve2d >> Point2d.placeOnto sketchPlane
 
         ProjectedCurve3d unprojectedCurve3d plane ->
-            curve3dPoint unprojectedCurve3d >> Point3d.projectOnto plane
+            curve3dPointOn unprojectedCurve3d >> Point3d.projectOnto plane
 
 
 curve3dProjectOnto : Plane3d -> Curve3d -> Curve3d

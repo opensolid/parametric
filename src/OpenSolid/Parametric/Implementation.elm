@@ -33,6 +33,12 @@ type Curve3d
     | ProjectedCurve3d Curve3d Plane3d
 
 
+type Surface3d
+    = ExtrusionSurface Curve3d Vector3d
+    | RevolutionSurface Curve3d Frame3d Float
+    | ParallelogramSurface Point3d Vector3d Vector3d
+
+
 curve2dPointOn : Curve2d -> Float -> Point2d
 curve2dPointOn curve2d =
     case curve2d of

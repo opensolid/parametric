@@ -9,3 +9,7 @@ type alias Curve2d =
 
 type alias Curve3d =
     Implementation.Curve3d
+
+
+type alias Surface3d =
+    Implementation.Surface3d

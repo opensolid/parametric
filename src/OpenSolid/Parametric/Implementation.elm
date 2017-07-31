@@ -16,6 +16,7 @@ import OpenSolid.Point3d as Point3d
 import OpenSolid.QuadraticSpline2d as QuadraticSpline2d
 import OpenSolid.QuadraticSpline3d as QuadraticSpline3d
 import OpenSolid.SketchPlane3d as SketchPlane3d
+import OpenSolid.Vector3d as Vector3d
 
 
 type Curve2d
@@ -264,3 +265,61 @@ curve3dRevolveAround axis angle curve =
                 }
     in
     RevolutionSurface (curve3dRelativeTo frame curve) frame angle
+
+
+surface3dPointOn : Surface3d -> Point2d -> Point3d
+surface3dPointOn surface =
+    case surface of
+        ParallelogramSurface point uVector vVector ->
+            let
+                ( x0, y0, z0 ) =
+                    Point3d.coordinates point
+
+                ( xu, yu, zu ) =
+                    Vector3d.components uVector
+
+                ( xv, yv, zv ) =
+                    Vector3d.components vVector
+            in
+            \(Point2d ( u, v )) ->
+                Point3d
+                    ( x0 + u * xu + v * xv
+                    , y0 + u * yu + v * yv
+                    , z0 + u * zu + v * zv
+                    )
+
+        ExtrusionSurface curve vector ->
+            let
+                pointOnCurve =
+                    curve3dPointOn curve
+            in
+            \(Point2d ( u, v )) ->
+                pointOnCurve u
+                    |> Point3d.translateBy (Vector3d.scaleBy v vector)
+
+        RevolutionSurface localCurve frame angle ->
+            let
+                pointOnCurve =
+                    curve3dPointOn localCurve
+            in
+            \(Point2d ( u, v )) ->
+                let
+                    ( x0, y0, z ) =
+                        Point3d.coordinates (pointOnCurve u)
+
+                    theta =
+                        v * angle
+
+                    cosTheta =
+                        cos theta
+
+                    sinTheta =
+                        sin theta
+
+                    x =
+                        x0 * cosTheta - y0 * sinTheta
+
+                    y =
+                        y0 * cosTheta + x0 * sinTheta
+                in
+                Point3d.in_ frame ( x, y, z )

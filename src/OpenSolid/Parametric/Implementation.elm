@@ -2,8 +2,10 @@ module OpenSolid.Parametric.Implementation exposing (..)
 
 import OpenSolid.Arc2d as Arc2d
 import OpenSolid.Arc3d as Arc3d
+import OpenSolid.Axis3d as Axis3d
 import OpenSolid.CubicSpline2d as CubicSpline2d
 import OpenSolid.CubicSpline3d as CubicSpline3d
+import OpenSolid.Direction3d as Direction3d
 import OpenSolid.Frame2d as Frame2d
 import OpenSolid.Geometry.Types exposing (..)
 import OpenSolid.LineSegment2d as LineSegment2d
@@ -228,3 +230,37 @@ curve3dRelativeTo frame curve =
             ProjectedCurve3d
                 (curve3dRelativeTo frame unprojectedCurve)
                 (Plane3d.relativeTo frame projectionPlane)
+
+
+curve3dExtrudeBy : Vector3d -> Curve3d -> Surface3d
+curve3dExtrudeBy vector curve =
+    case curve of
+        LineSegment3dCurve lineSegment3d ->
+            let
+                ( p0, p1 ) =
+                    LineSegment3d.endpoints lineSegment3d
+            in
+            ParallelogramSurface p0 (Point3d.vectorFrom p0 p1) vector
+
+        _ ->
+            ExtrusionSurface curve vector
+
+
+curve3dRevolveAround : Axis3d -> Float -> Curve3d -> Surface3d
+curve3dRevolveAround axis angle curve =
+    let
+        zDirection =
+            Axis3d.direction axis
+
+        ( xDirection, yDirection ) =
+            Direction3d.perpendicularBasis zDirection
+
+        frame =
+            Frame3d
+                { originPoint = Axis3d.originPoint axis
+                , xDirection = xDirection
+                , yDirection = yDirection
+                , zDirection = zDirection
+                }
+    in
+    RevolutionSurface (curve3dRelativeTo frame curve) frame angle

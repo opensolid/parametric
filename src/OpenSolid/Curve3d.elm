@@ -2,12 +2,14 @@ module OpenSolid.Curve3d
     exposing
         ( arc
         , cubicSpline
+        , extrudeBy
         , lineSegment
         , placeIn
         , pointOn
         , projectOnto
         , quadraticSpline
         , relativeTo
+        , revolveAround
         )
 
 import OpenSolid.Geometry.Types exposing (..)
@@ -53,3 +55,13 @@ relativeTo =
 placeIn : Frame3d -> Curve3d -> Curve3d
 placeIn =
     Implementation.curve3dPlaceIn
+
+
+extrudeBy : Vector3d -> Curve3d -> Surface3d
+extrudeBy =
+    Implementation.curve3dExtrudeBy
+
+
+revolveAround : Axis3d -> Float -> Curve3d -> Surface3d
+revolveAround =
+    Implementation.curve3dRevolveAround

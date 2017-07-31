@@ -3,9 +3,11 @@ module OpenSolid.Curve3d
         ( arc
         , cubicSpline
         , lineSegment
+        , placeIn
         , pointOn
         , projectOnto
         , quadraticSpline
+        , relativeTo
         )
 
 import OpenSolid.Geometry.Types exposing (..)
@@ -41,3 +43,13 @@ pointOn =
 projectOnto : Plane3d -> Curve3d -> Curve3d
 projectOnto =
     Implementation.curve3dProjectOnto
+
+
+relativeTo : Frame3d -> Curve3d -> Curve3d
+relativeTo =
+    Implementation.curve3dRelativeTo
+
+
+placeIn : Frame3d -> Curve3d -> Curve3d
+placeIn =
+    Implementation.curve3dPlaceIn

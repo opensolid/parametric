@@ -131,6 +131,29 @@ curve2dPlaceOnto sketchPlane curve2d =
                 PlacedCurve3d curve2d sketchPlane
 
 
+curve2dToPolyline : Float -> Curve2d -> Polyline2d
+curve2dToPolyline tolerance curve2d =
+    case curve2d of
+        LineSegment2dCurve lineSegment2d ->
+            let
+                ( p1, p2 ) =
+                    LineSegment2d.endpoints lineSegment2d
+            in
+            Polyline2d [ p1, p2 ]
+
+        Arc2dCurve arc2d ->
+            Arc2d.toPolyline tolerance arc2d
+
+        QuadraticSpline2dCurve quadraticSpline2d ->
+            Debug.crash "TODO"
+
+        CubicSpline2dCurve cubicSpline2d ->
+            Debug.crash "TODO"
+
+        ProjectedCurve2d curve3d projectionSketchPlane ->
+            Debug.crash "TODO"
+
+
 curve3dPointOn : Curve3d -> Float -> Point3d
 curve3dPointOn curve3d =
     case curve3d of

@@ -8,6 +8,7 @@ module OpenSolid.Curve2d
         , pointOn
         , quadraticSpline
         , relativeTo
+        , toPolyline
         )
 
 import OpenSolid.Geometry.Types exposing (..)
@@ -53,3 +54,8 @@ relativeTo =
 placeIn : Frame2d -> Curve2d -> Curve2d
 placeIn =
     Implementation.curve2dPlaceIn
+
+
+toPolyline : Float -> Curve2d -> Polyline2d
+toPolyline =
+    Implementation.curve2dToPolyline

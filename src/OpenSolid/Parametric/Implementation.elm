@@ -49,13 +49,13 @@ curve2dPointOn curve2d =
             LineSegment2d.interpolate lineSegment2d
 
         Arc2dCurve arc2d ->
-            Arc2d.point arc2d
+            Arc2d.pointOn arc2d
 
         QuadraticSpline2dCurve quadraticSpline2d ->
-            QuadraticSpline2d.point quadraticSpline2d
+            QuadraticSpline2d.pointOn quadraticSpline2d
 
         CubicSpline2dCurve cubicSpline2d ->
-            CubicSpline2d.point cubicSpline2d
+            CubicSpline2d.pointOn cubicSpline2d
 
         ProjectedCurve2d curve3d sketchPlane ->
             curve3dPointOn curve3d >> Point3d.projectInto sketchPlane
@@ -138,13 +138,13 @@ curve3dPointOn curve3d =
             LineSegment3d.interpolate lineSegment3d
 
         Arc3dCurve arc3d ->
-            Arc3d.point arc3d
+            Arc3d.pointOn arc3d
 
         QuadraticSpline3dCurve quadraticSpline3d ->
-            QuadraticSpline3d.point quadraticSpline3d
+            QuadraticSpline3d.pointOn quadraticSpline3d
 
         CubicSpline3dCurve cubicSpline3d ->
-            CubicSpline3d.point cubicSpline3d
+            CubicSpline3d.pointOn cubicSpline3d
 
         PlacedCurve3d curve2d sketchPlane ->
             curve2dPointOn curve2d >> Point2d.placeOnto sketchPlane

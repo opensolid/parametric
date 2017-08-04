@@ -16,6 +16,7 @@ import OpenSolid.Point3d as Point3d
 import OpenSolid.QuadraticSpline2d as QuadraticSpline2d
 import OpenSolid.QuadraticSpline3d as QuadraticSpline3d
 import OpenSolid.SketchPlane3d as SketchPlane3d
+import OpenSolid.Vector2d as Vector2d
 import OpenSolid.Vector3d as Vector3d
 
 
@@ -131,27 +132,84 @@ curve2dPlaceOnto sketchPlane curve2d =
                 PlacedCurve3d curve2d sketchPlane
 
 
-curve2dToPolyline : Float -> Curve2d -> Polyline2d
-curve2dToPolyline tolerance curve2d =
+curve2dMaxSecondDerivativeMagnitude : Curve2d -> Float
+curve2dMaxSecondDerivativeMagnitude curve2d =
     case curve2d of
-        LineSegment2dCurve lineSegment2d ->
-            let
-                ( p1, p2 ) =
-                    LineSegment2d.endpoints lineSegment2d
-            in
-            Polyline2d [ p1, p2 ]
+        LineSegment2dCurve _ ->
+            0
 
         Arc2dCurve arc2d ->
-            Arc2d.toPolyline tolerance arc2d
+            let
+                sweptAngle =
+                    Arc2d.sweptAngle arc2d
+            in
+            Arc2d.radius arc2d * sweptAngle * sweptAngle
 
         QuadraticSpline2dCurve quadraticSpline2d ->
-            Debug.crash "TODO"
+            let
+                ( p1, p2, p3 ) =
+                    QuadraticSpline2d.controlPoints quadraticSpline2d
+
+                v1 =
+                    Point2d.vectorFrom p1 p2
+
+                v2 =
+                    Point2d.vectorFrom p2 p3
+            in
+            2 * Vector2d.length (Vector2d.difference v2 v1)
 
         CubicSpline2dCurve cubicSpline2d ->
-            Debug.crash "TODO"
+            let
+                ( p1, p2, p3, p4 ) =
+                    CubicSpline2d.controlPoints cubicSpline2d
 
-        ProjectedCurve2d curve3d projectionSketchPlane ->
-            Debug.crash "TODO"
+                u1 =
+                    Point2d.vectorFrom p1 p2
+
+                u2 =
+                    Point2d.vectorFrom p2 p3
+
+                u3 =
+                    Point2d.vectorFrom p3 p4
+
+                v1 =
+                    Vector2d.difference u2 u1
+
+                v2 =
+                    Vector2d.difference u3 u2
+            in
+            6 * max (Vector2d.length v1) (Vector2d.length v2)
+
+        ProjectedCurve2d curve3d _ ->
+            curve3dMaxSecondDerivativeMagnitude curve3d
+
+
+curve2dNumSegments : Float -> Curve2d -> Int
+curve2dNumSegments tolerance curve2d =
+    if tolerance > 0 then
+        let
+            maxSecondDerivativeMagnitude =
+                curve2dMaxSecondDerivativeMagnitude curve2d
+        in
+        max 1 (ceiling (sqrt (maxSecondDerivativeMagnitude / (8 * tolerance))))
+    else
+        1
+
+
+curve2dToPolyline : Float -> Curve2d -> Polyline2d
+curve2dToPolyline tolerance curve2d =
+    let
+        numSegments =
+            curve2dNumSegments curve2d
+
+        parameterValues =
+            List.range 0 numSegments
+                |> List.map (\index -> toFloat index / toFloat numSegments)
+
+        points =
+            parameterValues |> List.map (curve2dPointOn curve2d)
+    in
+    Polyline2d points
 
 
 curve3dPointOn : Curve3d -> Float -> Point3d
@@ -254,6 +312,73 @@ curve3dRelativeTo frame curve =
             ProjectedCurve3d
                 (curve3dRelativeTo frame unprojectedCurve)
                 (Plane3d.relativeTo frame projectionPlane)
+
+
+curve3dMaxSecondDerivativeMagnitude : Curve3d -> Float
+curve3dMaxSecondDerivativeMagnitude curve3d =
+    case curve3d of
+        LineSegment3dCurve _ ->
+            0
+
+        Arc3dCurve arc3d ->
+            let
+                sweptAngle =
+                    Arc3d.sweptAngle arc3d
+            in
+            Arc3d.radius arc3d * sweptAngle * sweptAngle
+
+        QuadraticSpline3dCurve quadraticSpline3d ->
+            let
+                ( p1, p2, p3 ) =
+                    QuadraticSpline3d.controlPoints quadraticSpline3d
+
+                v1 =
+                    Point3d.vectorFrom p1 p2
+
+                v2 =
+                    Point3d.vectorFrom p2 p3
+            in
+            2 * Vector3d.length (Vector3d.difference v2 v1)
+
+        CubicSpline3dCurve cubicSpline3d ->
+            let
+                ( p1, p2, p3, p4 ) =
+                    CubicSpline3d.controlPoints cubicSpline3d
+
+                u1 =
+                    Point3d.vectorFrom p1 p2
+
+                u2 =
+                    Point3d.vectorFrom p2 p3
+
+                u3 =
+                    Point3d.vectorFrom p3 p4
+
+                v1 =
+                    Vector3d.difference u2 u1
+
+                v2 =
+                    Vector3d.difference u3 u2
+            in
+            6 * max (Vector3d.length v1) (Vector3d.length v2)
+
+        ProjectedCurve3d unprojectedCurve3d _ ->
+            curve3dMaxSecondDerivativeMagnitude unprojectedCurve3d
+
+        PlacedCurve3d curve2d _ ->
+            curve2dMaxSecondDerivativeMagnitude curve2d
+
+
+curve3dNumSegments : Float -> Curve3d -> Int
+curve3dNumSegments tolerance curve3d =
+    if tolerance > 0 then
+        let
+            maxSecondDerivativeMagnitude =
+                curve3dMaxSecondDerivativeMagnitude curve3d
+        in
+        max 1 (ceiling (sqrt (maxSecondDerivativeMagnitude / (8 * tolerance))))
+    else
+        1
 
 
 curve3dExtrudeBy : Vector3d -> Curve3d -> Surface3d

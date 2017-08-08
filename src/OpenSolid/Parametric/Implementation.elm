@@ -224,6 +224,12 @@ curve2dNumSegments tolerance curve2d =
         1
 
 
+evenlySpacedParameterValues : Int -> List Float
+evenlySpacedParameterValues numSegments =
+    List.range 0 numSegments
+        |> List.map (\index -> toFloat index / toFloat numSegments)
+
+
 curve2dToPolyline : Float -> Curve2d -> Polyline2d
 curve2dToPolyline tolerance curve2d =
     let
@@ -231,8 +237,7 @@ curve2dToPolyline tolerance curve2d =
             curve2dNumSegments tolerance curve2d
 
         parameterValues =
-            List.range 0 numSegments
-                |> List.map (\index -> toFloat index / toFloat numSegments)
+            evenlySpacedParameterValues numSegments
 
         points =
             parameterValues |> List.map (curve2dPointOn curve2d)

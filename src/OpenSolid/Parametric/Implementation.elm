@@ -245,6 +245,18 @@ curve2dToPolyline tolerance curve2d =
     Polyline2d points
 
 
+curve2dSamples : Float -> Curve2d -> List ( Point2d, Vector2d )
+curve2dSamples tolerance curve2d =
+    let
+        numSegments =
+            curve2dNumSegments tolerance curve2d
+
+        parameterValues =
+            evenlySpacedParameterValues numSegments
+    in
+    parameterValues |> List.map (curve2dEvaluate curve2d)
+
+
 curve3dPointOn : Curve3d -> Float -> Point3d
 curve3dPointOn curve3d =
     case curve3d of
@@ -463,6 +475,18 @@ curve3dToPolyline tolerance curve3d =
             parameterValues |> List.map (curve3dPointOn curve3d)
     in
     Polyline3d points
+
+
+curve3dSamples : Float -> Curve3d -> List ( Point3d, Vector3d )
+curve3dSamples tolerance curve3d =
+    let
+        numSegments =
+            curve3dNumSegments tolerance curve3d
+
+        parameterValues =
+            evenlySpacedParameterValues numSegments
+    in
+    parameterValues |> List.map (curve3dEvaluate curve3d)
 
 
 curve3dExtrudeBy : Vector3d -> Curve3d -> Surface3d

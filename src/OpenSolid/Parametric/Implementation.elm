@@ -228,7 +228,7 @@ curve2dToPolyline : Float -> Curve2d -> Polyline2d
 curve2dToPolyline tolerance curve2d =
     let
         numSegments =
-            curve2dNumSegments curve2d
+            curve2dNumSegments tolerance curve2d
 
         parameterValues =
             List.range 0 numSegments

@@ -10,6 +10,7 @@ module OpenSolid.Curve3d
         , quadraticSpline
         , relativeTo
         , revolveAround
+        , toPolyline
         )
 
 import OpenSolid.Geometry.Types exposing (..)
@@ -65,3 +66,8 @@ extrudeBy =
 revolveAround : Axis3d -> Float -> Curve3d -> Surface3d
 revolveAround =
     Implementation.curve3dRevolveAround
+
+
+toPolyline : Float -> Curve3d -> Polyline3d
+toPolyline =
+    Implementation.curve3dToPolyline

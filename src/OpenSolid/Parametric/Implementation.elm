@@ -450,6 +450,21 @@ curve3dNumSegments tolerance curve3d =
         1
 
 
+curve3dToPolyline : Float -> Curve3d -> Polyline3d
+curve3dToPolyline tolerance curve3d =
+    let
+        numSegments =
+            curve3dNumSegments tolerance curve3d
+
+        parameterValues =
+            evenlySpacedParameterValues numSegments
+
+        points =
+            parameterValues |> List.map (curve3dPointOn curve3d)
+    in
+    Polyline3d points
+
+
 curve3dExtrudeBy : Vector3d -> Curve3d -> Surface3d
 curve3dExtrudeBy vector curve =
     case curve of

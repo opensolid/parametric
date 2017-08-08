@@ -62,6 +62,34 @@ curve2dPointOn curve2d =
             curve3dPointOn curve3d >> Point3d.projectInto sketchPlane
 
 
+curve2dEvaluate : Curve2d -> Float -> ( Point2d, Vector2d )
+curve2dEvaluate curve2d =
+    case curve2d of
+        LineSegment2dCurve lineSegment2d ->
+            let
+                derivative =
+                    LineSegment2d.vector lineSegment2d
+            in
+            \t -> ( LineSegment2d.interpolate lineSegment2d t, derivative )
+
+        Arc2dCurve arc2d ->
+            Arc2d.evaluate arc2d
+
+        QuadraticSpline2dCurve quadraticSpline2d ->
+            QuadraticSpline2d.evaluate quadraticSpline2d
+
+        CubicSpline2dCurve cubicSpline2d ->
+            CubicSpline2d.evaluate cubicSpline2d
+
+        ProjectedCurve2d curve3d sketchPlane ->
+            curve3dEvaluate curve3d
+                >> (\( unprojectedPoint3d, unprojectedVector3d ) ->
+                        ( Point3d.projectInto sketchPlane unprojectedPoint3d
+                        , Vector3d.projectInto sketchPlane unprojectedVector3d
+                        )
+                   )
+
+
 curve2dPlaceIn : Frame2d -> Curve2d -> Curve2d
 curve2dPlaceIn frame curve2d =
     case curve2d of
@@ -232,6 +260,42 @@ curve3dPointOn curve3d =
 
         ProjectedCurve3d unprojectedCurve3d plane ->
             curve3dPointOn unprojectedCurve3d >> Point3d.projectOnto plane
+
+
+curve3dEvaluate : Curve3d -> Float -> ( Point3d, Vector3d )
+curve3dEvaluate curve3d =
+    case curve3d of
+        LineSegment3dCurve lineSegment3d ->
+            let
+                derivative =
+                    LineSegment3d.vector lineSegment3d
+            in
+            \t -> ( LineSegment3d.interpolate lineSegment3d t, derivative )
+
+        Arc3dCurve arc3d ->
+            Arc3d.evaluate arc3d
+
+        QuadraticSpline3dCurve quadraticSpline3d ->
+            QuadraticSpline3d.evaluate quadraticSpline3d
+
+        CubicSpline3dCurve cubicSpline3d ->
+            CubicSpline3d.evaluate cubicSpline3d
+
+        PlacedCurve3d curve2d sketchPlane ->
+            curve2dEvaluate curve2d
+                >> (\( point2d, vector2d ) ->
+                        ( Point2d.placeOnto sketchPlane point2d
+                        , Vector2d.placeOnto sketchPlane vector2d
+                        )
+                   )
+
+        ProjectedCurve3d unprojectedCurve3d plane ->
+            curve3dEvaluate unprojectedCurve3d
+                >> (\( unprojectedPoint3d, unprojectedVector3d ) ->
+                        ( Point3d.projectOnto plane unprojectedPoint3d
+                        , Vector3d.projectOnto plane unprojectedVector3d
+                        )
+                   )
 
 
 curve3dProjectOnto : Plane3d -> Curve3d -> Curve3d

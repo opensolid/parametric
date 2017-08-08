@@ -10,6 +10,7 @@ import OpenSolid.Frame2d as Frame2d
 import OpenSolid.Geometry.Types exposing (..)
 import OpenSolid.LineSegment2d as LineSegment2d
 import OpenSolid.LineSegment3d as LineSegment3d
+import OpenSolid.Mesh as Mesh exposing (Mesh)
 import OpenSolid.Plane3d as Plane3d
 import OpenSolid.Point2d as Point2d
 import OpenSolid.Point3d as Point3d
@@ -579,3 +580,104 @@ surface3dPointOn surface =
                         y0 * cosTheta + x0 * sinTheta
                 in
                 Point3d.in_ frame ( x, y, z )
+
+
+surface3dToMesh : Float -> Surface3d -> Mesh ( Point3d, Vector3d )
+surface3dToMesh tolerance surface3d =
+    case surface3d of
+        ParallelogramSurface point uVector vVector ->
+            let
+                n =
+                    Vector3d.normalize (Vector3d.crossProduct uVector vVector)
+
+                p0 =
+                    point
+
+                p1 =
+                    p0 |> Point3d.translateBy uVector
+
+                p2 =
+                    p1 |> Point3d.translateBy vVector
+
+                p3 =
+                    p0 |> Point3d.translateBy vVector
+
+                vertices =
+                    [ ( p0, n ), ( p1, n ), ( p2, n ), ( p3, n ) ]
+
+                faceIndices =
+                    [ ( 0, 1, 2 ), ( 0, 2, 3 ) ]
+            in
+            Mesh.fromList vertices faceIndices
+
+        ExtrusionSurface curve3d extrusionVector ->
+            let
+                curveSamples =
+                    curve3dSamples tolerance curve3d
+
+                toVertex ( curvePoint, curveDerivative ) =
+                    let
+                        normalVector =
+                            Vector3d.normalize <|
+                                Vector3d.crossProduct
+                                    curveDerivative
+                                    extrusionVector
+                    in
+                    ( curvePoint, normalVector )
+
+                startVertices =
+                    List.map toVertex curveSamples
+
+                toEndVertex ( startPoint, startNormal ) =
+                    ( Point3d.translateBy extrusionVector startPoint
+                    , startNormal
+                    )
+
+                endVertices =
+                    List.map toEndVertex startVertices
+
+                numColumns =
+                    List.length startVertices - 1
+
+                accumulate startVertices endVertices result =
+                    case ( startVertices, endVertices ) of
+                        ( startFirst :: startRest, endFirst :: endRest ) ->
+                            accumulate
+                                startRest
+                                endRest
+                                (startFirst :: endFirst :: result)
+
+                        _ ->
+                            result
+
+                vertices =
+                    accumulate startVertices endVertices []
+
+                prependFaces columnIndex faces =
+                    if columnIndex < numColumns then
+                        let
+                            offset =
+                                2 * columnIndex
+
+                            faceIndices1 =
+                                ( offset + 2, offset, offset + 1 )
+
+                            faceIndices2 =
+                                ( offset + 2, offset + 1, offset + 3 )
+                        in
+                        prependFaces (columnIndex + 1)
+                            (faceIndices1 :: faceIndices2 :: faces)
+                    else
+                        faces
+
+                faceIndices =
+                    prependFaces 0 []
+            in
+            Mesh.fromList vertices faceIndices
+
+        RevolutionSurface localCurve3d frame angle ->
+            let
+                numCurveSegments =
+                    curve3dNumSegments tolerance localCurve3d
+            in
+            Debug.crash "TODO"

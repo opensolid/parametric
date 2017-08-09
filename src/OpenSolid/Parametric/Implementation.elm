@@ -821,26 +821,26 @@ surface3dToMesh tolerance surface3d =
                                 )
                             )
 
-                numRows =
+                numColumns =
                     List.length curveSamples - 1
 
-                numColumns =
+                numRows =
                     numRotationSteps
 
                 prependFaces rowIndex columnIndex faces =
-                    if rowIndex < numRows then
+                    if columnIndex < numColumns then
                         let
                             i1 =
-                                columnIndex * numRows + rowIndex
+                                rowIndex * (numColumns + 1) + columnIndex
 
                             i2 =
-                                i1 + numRows
+                                i1 + 1
 
                             i3 =
-                                i2 + 1
+                                i2 + numColumns + 1
 
                             i4 =
-                                i1 + 1
+                                i3 - 1
 
                             faceIndices1 =
                                 ( i1, i2, i3 )
@@ -849,11 +849,11 @@ surface3dToMesh tolerance surface3d =
                                 ( i1, i3, i4 )
                         in
                         prependFaces
-                            (rowIndex + 1)
-                            columnIndex
+                            rowIndex
+                            (columnIndex + 1)
                             (faceIndices1 :: faceIndices2 :: faces)
-                    else if columnIndex < numColumns then
-                        prependFaces 0 (columnIndex + 1) faces
+                    else if rowIndex < (numRows - 1) then
+                        prependFaces (rowIndex + 1) 0 faces
                     else
                         faces
 

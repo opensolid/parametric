@@ -2,6 +2,10 @@ module OpenSolid.Curve2d
     exposing
         ( arc
         , cubicSpline
+        , fromArc
+        , fromCubicSpline
+        , fromLineSegment
+        , fromQuadraticSpline
         , lineSegment
         , placeIn
         , placeOnto
@@ -16,24 +20,44 @@ import OpenSolid.Parametric.Implementation as Implementation
 import OpenSolid.Parametric.Types exposing (..)
 
 
-lineSegment : LineSegment2d -> Curve2d
-lineSegment =
+fromLineSegment : LineSegment2d -> Curve2d
+fromLineSegment =
     Implementation.LineSegment2dCurve
 
 
-arc : Arc2d -> Curve2d
-arc =
+lineSegment : ( Point2d, Point2d ) -> Curve2d
+lineSegment =
+    fromLineSegment << LineSegment2d
+
+
+fromArc : Arc2d -> Curve2d
+fromArc =
     Implementation.Arc2dCurve
 
 
-cubicSpline : CubicSpline2d -> Curve2d
-cubicSpline =
+arc : { startPoint : Point2d, centerPoint : Point2d, sweptAngle : Float } -> Curve2d
+arc =
+    fromArc << Arc2d
+
+
+fromCubicSpline : CubicSpline2d -> Curve2d
+fromCubicSpline =
     Implementation.CubicSpline2dCurve
 
 
-quadraticSpline : QuadraticSpline2d -> Curve2d
-quadraticSpline =
+cubicSpline : ( Point2d, Point2d, Point2d, Point2d ) -> Curve2d
+cubicSpline =
+    fromCubicSpline << CubicSpline2d
+
+
+fromQuadraticSpline : QuadraticSpline2d -> Curve2d
+fromQuadraticSpline =
     Implementation.QuadraticSpline2dCurve
+
+
+quadraticSpline : ( Point2d, Point2d, Point2d ) -> Curve2d
+quadraticSpline =
+    fromQuadraticSpline << QuadraticSpline2d
 
 
 pointOn : Curve2d -> Float -> Point2d

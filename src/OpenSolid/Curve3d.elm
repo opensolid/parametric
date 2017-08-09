@@ -3,6 +3,10 @@ module OpenSolid.Curve3d
         ( arc
         , cubicSpline
         , extrudeBy
+        , fromArc
+        , fromCubicSpline
+        , fromLineSegment
+        , fromQuadraticSpline
         , lineSegment
         , placeIn
         , pointOn
@@ -18,23 +22,43 @@ import OpenSolid.Parametric.Implementation as Implementation
 import OpenSolid.Parametric.Types exposing (..)
 
 
-lineSegment : LineSegment3d -> Curve3d
+lineSegment : ( Point3d, Point3d ) -> Curve3d
 lineSegment =
+    fromLineSegment << LineSegment3d
+
+
+fromLineSegment : LineSegment3d -> Curve3d
+fromLineSegment =
     Implementation.LineSegment3dCurve
 
 
-arc : Arc3d -> Curve3d
+arc : { startPoint : Point3d, axis : Axis3d, sweptAngle : Float } -> Curve3d
 arc =
+    fromArc << Arc3d
+
+
+fromArc : Arc3d -> Curve3d
+fromArc =
     Implementation.Arc3dCurve
 
 
-cubicSpline : CubicSpline3d -> Curve3d
+cubicSpline : ( Point3d, Point3d, Point3d, Point3d ) -> Curve3d
 cubicSpline =
+    fromCubicSpline << CubicSpline3d
+
+
+fromCubicSpline : CubicSpline3d -> Curve3d
+fromCubicSpline =
     Implementation.CubicSpline3dCurve
 
 
-quadraticSpline : QuadraticSpline3d -> Curve3d
+quadraticSpline : ( Point3d, Point3d, Point3d ) -> Curve3d
 quadraticSpline =
+    fromQuadraticSpline << QuadraticSpline3d
+
+
+fromQuadraticSpline : QuadraticSpline3d -> Curve3d
+fromQuadraticSpline =
     Implementation.QuadraticSpline3dCurve
 
 

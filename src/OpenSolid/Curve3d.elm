@@ -14,7 +14,9 @@ module OpenSolid.Curve3d
         , quadraticSpline
         , relativeTo
         , revolveAround
+        , rotateAround
         , toPolyline
+        , translateBy
         )
 
 import OpenSolid.Geometry.Types exposing (..)
@@ -95,3 +97,13 @@ revolveAround =
 toPolyline : Float -> Curve3d -> Polyline3d
 toPolyline =
     Implementation.curve3dToPolyline
+
+
+rotateAround : Axis3d -> Float -> Curve3d -> Curve3d
+rotateAround =
+    Implementation.curve3dRotateAround
+
+
+translateBy : Vector3d -> Curve3d -> Curve3d
+translateBy =
+    Implementation.curve3dTranslateBy

@@ -397,6 +397,62 @@ curve3dRelativeTo frame curve =
                 (Plane3d.relativeTo frame projectionPlane)
 
 
+curve3dRotateAround : Axis3d -> Float -> Curve3d -> Curve3d
+curve3dRotateAround axis angle curve3d =
+    case curve3d of
+        LineSegment3dCurve lineSegment ->
+            LineSegment3dCurve
+                (LineSegment3d.rotateAround axis angle lineSegment)
+
+        Arc3dCurve arc ->
+            Arc3dCurve (Arc3d.rotateAround axis angle arc)
+
+        QuadraticSpline3dCurve quadraticSpline ->
+            QuadraticSpline3dCurve
+                (QuadraticSpline3d.rotateAround axis angle quadraticSpline)
+
+        CubicSpline3dCurve cubicSpline ->
+            CubicSpline3dCurve
+                (CubicSpline3d.rotateAround axis angle cubicSpline)
+
+        PlacedCurve3d curve2d sketchPlane ->
+            PlacedCurve3d curve2d
+                (SketchPlane3d.rotateAround axis angle sketchPlane)
+
+        ProjectedCurve3d unprojectedCurve projectionPlane ->
+            ProjectedCurve3d
+                (curve3dRotateAround axis angle unprojectedCurve)
+                (Plane3d.rotateAround axis angle projectionPlane)
+
+
+curve3dTranslateBy : Vector3d -> Curve3d -> Curve3d
+curve3dTranslateBy displacement curve3d =
+    case curve3d of
+        LineSegment3dCurve lineSegment ->
+            LineSegment3dCurve
+                (LineSegment3d.translateBy displacement lineSegment)
+
+        Arc3dCurve arc ->
+            Arc3dCurve (Arc3d.translateBy displacement arc)
+
+        QuadraticSpline3dCurve quadraticSpline ->
+            QuadraticSpline3dCurve
+                (QuadraticSpline3d.translateBy displacement quadraticSpline)
+
+        CubicSpline3dCurve cubicSpline ->
+            CubicSpline3dCurve
+                (CubicSpline3d.translateBy displacement cubicSpline)
+
+        PlacedCurve3d curve2d sketchPlane ->
+            PlacedCurve3d curve2d
+                (SketchPlane3d.translateBy displacement sketchPlane)
+
+        ProjectedCurve3d unprojectedCurve projectionPlane ->
+            ProjectedCurve3d
+                (curve3dTranslateBy displacement unprojectedCurve)
+                (Plane3d.translateBy displacement projectionPlane)
+
+
 curve3dMaxSecondDerivativeMagnitude : Curve3d -> Float
 curve3dMaxSecondDerivativeMagnitude curve3d =
     case curve3d of

@@ -671,7 +671,7 @@ surface3dToMesh tolerance surface3d =
 
         RevolutionSurface localCurve3d frame sweptAngle ->
             let
-                localCurveSamples =
+                curveSamples =
                     curve3dSamples tolerance localCurve3d
 
                 squaredRadius point =
@@ -688,7 +688,7 @@ surface3dToMesh tolerance surface3d =
                                 max currentMax (squaredRadius point)
                             )
                             0
-                            localCurveSamples
+                            curveSamples
 
                 maxSecondDerivativeMagnitude =
                     maxRadius * sweptAngle * sweptAngle
@@ -696,14 +696,106 @@ surface3dToMesh tolerance surface3d =
                 numRotationSteps =
                     curveNumSegments tolerance maxSecondDerivativeMagnitude
 
-                toStartVertex ( point, derivative ) =
+                toStartVertex ( point, vDerivative ) =
                     let
                         ( x, y, _ ) =
                             Point3d.coordinates point
 
-                        vDerivative =
-                            Vector3d
+                        uDerivative =
+                            Vector3d ( sweptAngle * x, sweptAngle * y, 0 )
+
+                        normalVector =
+                            Vector3d.normalize <|
+                                Vector3d.crossProduct uDerivative vDerivative
                     in
-                    Debug.crash "TODO"
+                    ( point, normalVector )
+
+                startVertices =
+                    List.map toStartVertex curveSamples
+
+                rotateVertexBy angle =
+                    let
+                        cosAngle =
+                            cos angle
+
+                        sinAngle =
+                            sin angle
+                    in
+                    \( point, normalVector ) ->
+                        let
+                            ( x, y, z ) =
+                                Point3d.coordinates point
+
+                            ( nx, ny, nz ) =
+                                Vector3d.components normalVector
+                        in
+                        ( Point3d
+                            ( x * cosAngle - y * sinAngle
+                            , y * cosAngle + x * sinAngle
+                            , z
+                            )
+                        , Vector3d
+                            ( nx * cosAngle - ny * sinAngle
+                            , ny * cosAngle + nx * sinAngle
+                            , nz
+                            )
+                        )
+
+                rotationAngles =
+                    List.range 1 numRotationSteps
+                        |> List.map
+                            (\index ->
+                                sweptAngle
+                                    * (toFloat index / toFloat numRotationSteps)
+                            )
+
+                rotatedVertexLists =
+                    rotationAngles
+                        |> List.map
+                            (\angle ->
+                                startVertices |> List.map (rotateVertexBy angle)
+                            )
+
+                vertices =
+                    List.concat (startVertices :: rotatedVertexLists)
+
+                numRows =
+                    List.length curveSamples - 1
+
+                numColumns =
+                    numRotationSteps
+
+                prependFaces rowIndex columnIndex faces =
+                    if rowIndex < numRows then
+                        let
+                            i1 =
+                                columnIndex * numRows + rowIndex
+
+                            i2 =
+                                i1 + numRows
+
+                            i3 =
+                                i2 + 1
+
+                            i4 =
+                                i1 + 1
+
+                            faceIndices1 =
+                                ( i1, i2, i3 )
+
+                            faceIndices2 =
+                                ( i1, i3, i4 )
+                        in
+                        prependFaces
+                            (rowIndex + 1)
+                            columnIndex
+                            (faceIndices1 :: faceIndices2 :: faces)
+                    else if columnIndex < numColumns then
+                        prependFaces 0 (columnIndex + 1) faces
+                    else
+                        faces
+
+                faceIndices =
+                    prependFaces 0 0 []
             in
-            Debug.crash "TODO"
+            Mesh.fromList vertices faceIndices

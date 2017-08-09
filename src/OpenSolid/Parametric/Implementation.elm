@@ -669,9 +669,41 @@ surface3dToMesh tolerance surface3d =
             in
             Mesh.fromList vertices faceIndices
 
-        RevolutionSurface localCurve3d frame angle ->
+        RevolutionSurface localCurve3d frame sweptAngle ->
             let
-                numCurveSegments =
-                    curve3dNumSegments tolerance localCurve3d
+                localCurveSamples =
+                    curve3dSamples tolerance localCurve3d
+
+                squaredRadius point =
+                    let
+                        ( x, y, _ ) =
+                            Point3d.coordinates point
+                    in
+                    x * x + y * y
+
+                maxRadius =
+                    sqrt <|
+                        List.foldl
+                            (\( point, derivative ) currentMax ->
+                                max currentMax (squaredRadius point)
+                            )
+                            0
+                            localCurveSamples
+
+                maxSecondDerivativeMagnitude =
+                    maxRadius * sweptAngle * sweptAngle
+
+                numRotationSteps =
+                    curveNumSegments tolerance maxSecondDerivativeMagnitude
+
+                toStartVertex ( point, derivative ) =
+                    let
+                        ( x, y, _ ) =
+                            Point3d.coordinates point
+
+                        vDerivative =
+                            Vector3d
+                    in
+                    Debug.crash "TODO"
             in
             Debug.crash "TODO"

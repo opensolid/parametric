@@ -752,12 +752,12 @@ surface3dToMesh tolerance surface3d =
                 numRotationSteps =
                     curveNumSegments tolerance maxSecondDerivativeMagnitude
 
-                toStartVertex ( point, vDerivative ) =
+                toStartVertex ( point, uDerivative ) =
                     let
                         ( x, y, _ ) =
                             Point3d.coordinates point
 
-                        uDerivative =
+                        vDerivative =
                             Vector3d ( sweptAngle * x, sweptAngle * y, 0 )
 
                         normalVector =

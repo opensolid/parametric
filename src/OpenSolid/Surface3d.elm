@@ -1,6 +1,7 @@
 module OpenSolid.Surface3d
     exposing
         ( pointOn
+        , rotateAround
         , toMesh
         )
 
@@ -18,3 +19,8 @@ pointOn =
 toMesh : Float -> Surface3d -> Mesh ( Point3d, Vector3d )
 toMesh =
     Implementation.surface3dToMesh
+
+
+rotateAround : Axis3d -> Float -> Surface3d -> Surface3d
+rotateAround =
+    Implementation.surface3dRotateAround

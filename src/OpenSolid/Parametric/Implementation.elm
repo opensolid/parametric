@@ -7,6 +7,7 @@ import OpenSolid.CubicSpline2d as CubicSpline2d
 import OpenSolid.CubicSpline3d as CubicSpline3d
 import OpenSolid.Direction3d as Direction3d
 import OpenSolid.Frame2d as Frame2d
+import OpenSolid.Frame3d as Frame3d
 import OpenSolid.Geometry.Types exposing (..)
 import OpenSolid.LineSegment2d as LineSegment2d
 import OpenSolid.LineSegment3d as LineSegment3d
@@ -861,3 +862,28 @@ surface3dToMesh tolerance surface3d =
                     prependFaces 0 0 []
             in
             Mesh.fromList vertices faceIndices
+
+
+surface3dRotateAround : Axis3d -> Float -> Surface3d -> Surface3d
+surface3dRotateAround axis angle surface =
+    case surface of
+        ExtrusionSurface curve3d extrusionVector ->
+            ExtrusionSurface
+                (curve3dRotateAround axis angle curve3d)
+                (Vector3d.rotateAround axis angle extrusionVector)
+
+        RevolutionSurface localCurve3d frame sweptAngle ->
+            RevolutionSurface
+                localCurve3d
+                (Frame3d.rotateAround axis angle frame)
+                sweptAngle
+
+        ParallelogramSurface point uVector vVector ->
+            let
+                rotateVector =
+                    Vector3d.rotateAround axis angle
+            in
+            ParallelogramSurface
+                (Point3d.rotateAround axis angle point)
+                (rotateVector uVector)
+                (rotateVector vVector)

@@ -213,16 +213,17 @@ curve2dMaxSecondDerivativeMagnitude curve2d =
             curve3dMaxSecondDerivativeMagnitude curve3d
 
 
-curve2dNumSegments : Float -> Curve2d -> Int
-curve2dNumSegments tolerance curve2d =
+curveNumSegments : Float -> Float -> Int
+curveNumSegments tolerance maxSecondDerivativeMagnitude =
     if tolerance > 0 then
-        let
-            maxSecondDerivativeMagnitude =
-                curve2dMaxSecondDerivativeMagnitude curve2d
-        in
         max 1 (ceiling (sqrt (maxSecondDerivativeMagnitude / (8 * tolerance))))
     else
         1
+
+
+curve2dNumSegments : Float -> Curve2d -> Int
+curve2dNumSegments tolerance curve2d =
+    curveNumSegments tolerance (curve2dMaxSecondDerivativeMagnitude curve2d)
 
 
 evenlySpacedParameterValues : Int -> List Float
@@ -453,14 +454,7 @@ curve3dMaxSecondDerivativeMagnitude curve3d =
 
 curve3dNumSegments : Float -> Curve3d -> Int
 curve3dNumSegments tolerance curve3d =
-    if tolerance > 0 then
-        let
-            maxSecondDerivativeMagnitude =
-                curve3dMaxSecondDerivativeMagnitude curve3d
-        in
-        max 1 (ceiling (sqrt (maxSecondDerivativeMagnitude / (8 * tolerance))))
-    else
-        1
+    curveNumSegments tolerance (curve3dMaxSecondDerivativeMagnitude curve3d)
 
 
 curve3dToPolyline : Float -> Curve3d -> Polyline3d

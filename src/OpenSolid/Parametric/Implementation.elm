@@ -814,6 +814,12 @@ surface3dToMesh tolerance surface3d =
 
                 vertices =
                     List.concat (startVertices :: rotatedVertexLists)
+                        |> List.map
+                            (\( position, normal ) ->
+                                ( Point3d.placeIn frame position
+                                , Vector3d.placeIn frame normal
+                                )
+                            )
 
                 numRows =
                     List.length curveSamples - 1

@@ -45,6 +45,19 @@ type Surface3d
     | ParallelogramSurface Point3d Vector3d Vector3d
 
 
+type EdgeType
+    = Interior
+    | Exterior
+
+
+type Region2d
+    = RectangleRegion Rectangle2d { left : EdgeType, right : EdgeType, top : EdgeType, bottom : EdgeType }
+    | CircleRegion Circle2d
+    | ExtrusionRegion Curve2d Vector2d { start : EdgeType, end : EdgeType, left : EdgeType, right : EdgeType }
+    | RevolutionRegion Curve2d Point2d Float { start : EdgeType, end : EdgeType, inside : EdgeType, outside : EdgeType }
+    | Fused (List Region2d)
+
+
 curve2dStartPoint : Curve2d -> Point2d
 curve2dStartPoint curve2d =
     case curve2d of

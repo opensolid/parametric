@@ -13,3 +13,7 @@ type alias Curve3d =
 
 type alias Surface3d =
     Implementation.Surface3d
+
+
+type alias Region2d =
+    Implementation.Region2d

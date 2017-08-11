@@ -2,6 +2,7 @@ module OpenSolid.Curve2d
     exposing
         ( arc
         , cubicSpline
+        , endPoint
         , fromArc
         , fromCubicSpline
         , fromLineSegment
@@ -13,6 +14,7 @@ module OpenSolid.Curve2d
         , quadraticSpline
         , relativeTo
         , rotateAround
+        , startPoint
         , toPolyline
         , translateBy
         )
@@ -95,3 +97,13 @@ translateBy =
 rotateAround : Point2d -> Float -> Curve2d -> Curve2d
 rotateAround =
     Implementation.curve2dRotateAround
+
+
+startPoint : Curve2d -> Point2d
+startPoint =
+    Implementation.curve2dStartPoint
+
+
+endPoint : Curve2d -> Point2d
+endPoint =
+    Implementation.curve2dEndPoint

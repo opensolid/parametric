@@ -45,6 +45,44 @@ type Surface3d
     | ParallelogramSurface Point3d Vector3d Vector3d
 
 
+curve2dStartPoint : Curve2d -> Point2d
+curve2dStartPoint curve2d =
+    case curve2d of
+        LineSegment2dCurve lineSegment2d ->
+            LineSegment2d.startPoint lineSegment2d
+
+        Arc2dCurve arc2d ->
+            Arc2d.startPoint arc2d
+
+        QuadraticSpline2dCurve quadraticSpline2d ->
+            QuadraticSpline2d.startPoint quadraticSpline2d
+
+        CubicSpline2dCurve cubicSpline2d ->
+            CubicSpline2d.startPoint cubicSpline2d
+
+        ProjectedCurve2d curve3d sketchPlane ->
+            curve3dStartPoint curve3d |> Point3d.projectInto sketchPlane
+
+
+curve2dEndPoint : Curve2d -> Point2d
+curve2dEndPoint curve2d =
+    case curve2d of
+        LineSegment2dCurve lineSegment2d ->
+            LineSegment2d.endPoint lineSegment2d
+
+        Arc2dCurve arc2d ->
+            Arc2d.endPoint arc2d
+
+        QuadraticSpline2dCurve quadraticSpline2d ->
+            QuadraticSpline2d.endPoint quadraticSpline2d
+
+        CubicSpline2dCurve cubicSpline2d ->
+            CubicSpline2d.endPoint cubicSpline2d
+
+        ProjectedCurve2d curve3d sketchPlane ->
+            curve3dEndPoint curve3d |> Point3d.projectInto sketchPlane
+
+
 curve2dPointOn : Curve2d -> Float -> Point2d
 curve2dPointOn curve2d =
     case curve2d of
@@ -326,6 +364,50 @@ curve2dSamples tolerance curve2d =
             evenlySpacedParameterValues numSegments
     in
     parameterValues |> List.map (curve2dEvaluate curve2d)
+
+
+curve3dStartPoint : Curve3d -> Point3d
+curve3dStartPoint curve3d =
+    case curve3d of
+        LineSegment3dCurve lineSegment3d ->
+            LineSegment3d.startPoint lineSegment3d
+
+        Arc3dCurve arc3d ->
+            Arc3d.startPoint arc3d
+
+        QuadraticSpline3dCurve quadraticSpline3d ->
+            QuadraticSpline3d.startPoint quadraticSpline3d
+
+        CubicSpline3dCurve cubicSpline3d ->
+            CubicSpline3d.startPoint cubicSpline3d
+
+        PlacedCurve3d curve2d sketchPlane ->
+            curve2dStartPoint curve2d |> Point2d.placeOnto sketchPlane
+
+        ProjectedCurve3d unprojectedCurve3d plane ->
+            curve3dStartPoint unprojectedCurve3d |> Point3d.projectOnto plane
+
+
+curve3dEndPoint : Curve3d -> Point3d
+curve3dEndPoint curve3d =
+    case curve3d of
+        LineSegment3dCurve lineSegment3d ->
+            LineSegment3d.endPoint lineSegment3d
+
+        Arc3dCurve arc3d ->
+            Arc3d.endPoint arc3d
+
+        QuadraticSpline3dCurve quadraticSpline3d ->
+            QuadraticSpline3d.endPoint quadraticSpline3d
+
+        CubicSpline3dCurve cubicSpline3d ->
+            CubicSpline3d.endPoint cubicSpline3d
+
+        PlacedCurve3d curve2d sketchPlane ->
+            curve2dEndPoint curve2d |> Point2d.placeOnto sketchPlane
+
+        ProjectedCurve3d unprojectedCurve3d plane ->
+            curve3dEndPoint unprojectedCurve3d |> Point3d.projectOnto plane
 
 
 curve3dPointOn : Curve3d -> Float -> Point3d

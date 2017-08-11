@@ -2,6 +2,7 @@ module OpenSolid.Curve3d
     exposing
         ( arc
         , cubicSpline
+        , endPoint
         , extrudeBy
         , fromArc
         , fromCubicSpline
@@ -15,6 +16,7 @@ module OpenSolid.Curve3d
         , relativeTo
         , revolveAround
         , rotateAround
+        , startPoint
         , toPolyline
         , translateBy
         )
@@ -107,3 +109,13 @@ rotateAround =
 translateBy : Vector3d -> Curve3d -> Curve3d
 translateBy =
     Implementation.curve3dTranslateBy
+
+
+startPoint : Curve3d -> Point3d
+startPoint =
+    Implementation.curve3dStartPoint
+
+
+endPoint : Curve3d -> Point3d
+endPoint =
+    Implementation.curve3dEndPoint

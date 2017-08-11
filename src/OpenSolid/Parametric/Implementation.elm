@@ -3,6 +3,7 @@ module OpenSolid.Parametric.Implementation exposing (..)
 import OpenSolid.Arc2d as Arc2d
 import OpenSolid.Arc3d as Arc3d
 import OpenSolid.Axis3d as Axis3d
+import OpenSolid.Circle2d as Circle2d
 import OpenSolid.CubicSpline2d as CubicSpline2d
 import OpenSolid.CubicSpline3d as CubicSpline3d
 import OpenSolid.Direction3d as Direction3d
@@ -17,6 +18,7 @@ import OpenSolid.Point2d as Point2d
 import OpenSolid.Point3d as Point3d
 import OpenSolid.QuadraticSpline2d as QuadraticSpline2d
 import OpenSolid.QuadraticSpline3d as QuadraticSpline3d
+import OpenSolid.Rectangle2d as Rectangle2d
 import OpenSolid.SketchPlane3d as SketchPlane3d
 import OpenSolid.Vector2d as Vector2d
 import OpenSolid.Vector3d as Vector3d
@@ -1050,3 +1052,196 @@ surface3dRotateAround axis angle surface =
                 (Point3d.rotateAround axis angle point)
                 (rotateVector uVector)
                 (rotateVector vVector)
+
+
+regionBoundaries : Region2d -> List Curve2d
+regionBoundaries region =
+    case region of
+        RectangleRegion rectangle edgeTypes ->
+            let
+                ( p1, p2, p3, p4 ) =
+                    Rectangle2d.vertices rectangle
+
+                boundaryCurve edgeType startPoint endPoint =
+                    case edgeType of
+                        Exterior ->
+                            Just <|
+                                LineSegment2dCurve <|
+                                    LineSegment2d ( startPoint, endPoint )
+
+                        Interior ->
+                            Nothing
+            in
+            List.filterMap identity
+                [ boundaryCurve edgeTypes.bottom p1 p2
+                , boundaryCurve edgeTypes.right p2 p3
+                , boundaryCurve edgeTypes.top p3 p4
+                , boundaryCurve edgeTypes.left p4 p1
+                ]
+
+        CircleRegion circle ->
+            [ Arc2dCurve (Circle2d.toArc circle) ]
+
+        ExtrusionRegion curve2d extrusionVector edgeTypes ->
+            let
+                startCurve =
+                    case edgeTypes.start of
+                        Exterior ->
+                            Just curve2d
+
+                        Interior ->
+                            Nothing
+
+                endCurve =
+                    case edgeTypes.end of
+                        Exterior ->
+                            Just (curve2dTranslateBy extrusionVector curve2d)
+
+                        Interior ->
+                            Nothing
+
+                startPoint =
+                    curve2dStartPoint curve2d
+
+                endPoint =
+                    curve2dEndPoint curve2d
+
+                displacement =
+                    Vector2d.from startPoint endPoint
+
+                leftToRight =
+                    Vector2d.crossProduct displacement extrusionVector >= 0
+
+                leftCurve =
+                    case edgeTypes.left of
+                        Exterior ->
+                            let
+                                p1 =
+                                    if leftToRight then
+                                        startPoint
+                                    else
+                                        endPoint
+
+                                p2 =
+                                    Point2d.translateBy extrusionVector p1
+                            in
+                            Just (LineSegment2dCurve (LineSegment2d ( p1, p2 )))
+
+                        Interior ->
+                            Nothing
+
+                rightCurve =
+                    case edgeTypes.right of
+                        Exterior ->
+                            let
+                                p1 =
+                                    if leftToRight then
+                                        endPoint
+                                    else
+                                        startPoint
+
+                                p2 =
+                                    Point2d.translateBy extrusionVector p1
+                            in
+                            Just (LineSegment2dCurve (LineSegment2d ( p1, p2 )))
+
+                        Interior ->
+                            Nothing
+            in
+            List.filterMap identity
+                [ startCurve
+                , endCurve
+                , leftCurve
+                , rightCurve
+                ]
+
+        RevolutionRegion curve2d centerPoint sweptAngle edgeTypes ->
+            let
+                startCurve =
+                    case edgeTypes.start of
+                        Exterior ->
+                            Just curve2d
+
+                        Interior ->
+                            Nothing
+
+                endCurve =
+                    case edgeTypes.end of
+                        Exterior ->
+                            Just <|
+                                curve2dRotateAround
+                                    centerPoint
+                                    sweptAngle
+                                    curve2d
+
+                        Interior ->
+                            Nothing
+
+                startPoint =
+                    curve2dStartPoint curve2d
+
+                endPoint =
+                    curve2dEndPoint curve2d
+
+                startSquaredRadius =
+                    Point2d.squaredDistanceFrom centerPoint startPoint
+
+                endSquaredRadius =
+                    Point2d.squaredDistanceFrom centerPoint endPoint
+
+                startIsInside =
+                    startSquaredRadius <= endSquaredRadius
+
+                insideCurve =
+                    case edgeTypes.inside of
+                        Exterior ->
+                            let
+                                p1 =
+                                    if startIsInside then
+                                        startPoint
+                                    else
+                                        endPoint
+
+                                arc =
+                                    Arc2d
+                                        { startPoint = p1
+                                        , centerPoint = centerPoint
+                                        , sweptAngle = sweptAngle
+                                        }
+                            in
+                            Just (Arc2dCurve arc)
+
+                        Interior ->
+                            Nothing
+
+                outsideCurve =
+                    case edgeTypes.outside of
+                        Exterior ->
+                            let
+                                p1 =
+                                    if startIsInside then
+                                        endPoint
+                                    else
+                                        startPoint
+
+                                arc =
+                                    Arc2d
+                                        { startPoint = p1
+                                        , centerPoint = centerPoint
+                                        , sweptAngle = sweptAngle
+                                        }
+                            in
+                            Just (Arc2dCurve arc)
+
+                        Interior ->
+                            Nothing
+            in
+            List.filterMap identity
+                [ startCurve
+                , endCurve
+                , insideCurve
+                , outsideCurve
+                ]
+
+        Fused regions ->
+            List.concat (List.map regionBoundaries regions)

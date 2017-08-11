@@ -12,7 +12,9 @@ module OpenSolid.Curve2d
         , pointOn
         , quadraticSpline
         , relativeTo
+        , rotateAround
         , toPolyline
+        , translateBy
         )
 
 import OpenSolid.Geometry.Types exposing (..)
@@ -83,3 +85,13 @@ placeIn =
 toPolyline : Float -> Curve2d -> Polyline2d
 toPolyline =
     Implementation.curve2dToPolyline
+
+
+translateBy : Vector2d -> Curve2d -> Curve2d
+translateBy =
+    Implementation.curve2dTranslateBy
+
+
+rotateAround : Point2d -> Float -> Curve2d -> Curve2d
+rotateAround =
+    Implementation.curve2dRotateAround

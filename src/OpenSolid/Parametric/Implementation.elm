@@ -162,6 +162,74 @@ curve2dPlaceOnto sketchPlane curve2d =
                 PlacedCurve3d curve2d sketchPlane
 
 
+curve2dTranslateBy : Vector2d -> Curve2d -> Curve2d
+curve2dTranslateBy displacement curve2d =
+    case curve2d of
+        LineSegment2dCurve lineSegment2d ->
+            LineSegment2dCurve
+                (LineSegment2d.translateBy displacement lineSegment2d)
+
+        Arc2dCurve arc2d ->
+            Arc2dCurve
+                (Arc2d.translateBy displacement arc2d)
+
+        QuadraticSpline2dCurve quadraticSpline2d ->
+            QuadraticSpline2dCurve
+                (QuadraticSpline2d.translateBy displacement quadraticSpline2d)
+
+        CubicSpline2dCurve cubicSpline2d ->
+            CubicSpline2dCurve
+                (CubicSpline2d.translateBy displacement cubicSpline2d)
+
+        ProjectedCurve2d curve3d projectionSketchPlane ->
+            let
+                sketchPlaneDisplacement =
+                    Vector2d.flip displacement
+                        |> Vector2d.placeOnto projectionSketchPlane
+
+                translatedSketchPlane =
+                    projectionSketchPlane
+                        |> SketchPlane3d.translateBy sketchPlaneDisplacement
+            in
+            ProjectedCurve2d curve3d translatedSketchPlane
+
+
+curve2dRotateAround : Point2d -> Float -> Curve2d -> Curve2d
+curve2dRotateAround point angle curve2d =
+    case curve2d of
+        LineSegment2dCurve lineSegment2d ->
+            LineSegment2dCurve
+                (LineSegment2d.rotateAround point angle lineSegment2d)
+
+        Arc2dCurve arc2d ->
+            Arc2dCurve
+                (Arc2d.rotateAround point angle arc2d)
+
+        QuadraticSpline2dCurve quadraticSpline2d ->
+            QuadraticSpline2dCurve
+                (QuadraticSpline2d.rotateAround point angle quadraticSpline2d)
+
+        CubicSpline2dCurve cubicSpline2d ->
+            CubicSpline2dCurve
+                (CubicSpline2d.rotateAround point angle cubicSpline2d)
+
+        ProjectedCurve2d curve3d projectionSketchPlane ->
+            let
+                rotationAxis =
+                    Axis3d
+                        { originPoint =
+                            Point2d.placeOnto projectionSketchPlane point
+                        , direction =
+                            SketchPlane3d.normalDirection projectionSketchPlane
+                        }
+
+                rotatedSketchPlane =
+                    projectionSketchPlane
+                        |> SketchPlane3d.rotateAround rotationAxis -angle
+            in
+            ProjectedCurve2d curve3d rotatedSketchPlane
+
+
 curve2dMaxSecondDerivativeMagnitude : Curve2d -> Float
 curve2dMaxSecondDerivativeMagnitude curve2d =
     case curve2d of

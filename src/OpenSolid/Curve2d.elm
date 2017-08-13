@@ -8,6 +8,7 @@ module OpenSolid.Curve2d
         , fromLineSegment
         , fromQuadraticSpline
         , lineSegment
+        , mirrorAcross
         , placeIn
         , placeOnto
         , pointOn
@@ -98,6 +99,11 @@ translateBy =
 rotateAround : Point2d -> Float -> Curve2d -> Curve2d
 rotateAround =
     Implementation.curve2dRotateAround
+
+
+mirrorAcross : Axis2d -> Curve2d -> Curve2d
+mirrorAcross =
+    Implementation.curve2dMirrorAcross
 
 
 startPoint : Curve2d -> Point2d

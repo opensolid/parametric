@@ -303,6 +303,35 @@ curve2dRotateAround point angle curve2d =
             ProjectedCurve2d curve3d rotatedSketchPlane
 
 
+curve2dMirrorAcross : Axis2d -> Curve2d -> Curve2d
+curve2dMirrorAcross axis curve2d =
+    case curve2d of
+        LineSegment2dCurve lineSegment2d ->
+            LineSegment2dCurve
+                (LineSegment2d.mirrorAcross axis lineSegment2d)
+
+        Arc2dCurve arc2d ->
+            Arc2dCurve
+                (Arc2d.mirrorAcross axis arc2d)
+
+        QuadraticSpline2dCurve quadraticSpline2d ->
+            QuadraticSpline2dCurve
+                (QuadraticSpline2d.mirrorAcross axis quadraticSpline2d)
+
+        CubicSpline2dCurve cubicSpline2d ->
+            CubicSpline2dCurve
+                (CubicSpline2d.mirrorAcross axis cubicSpline2d)
+
+        ProjectedCurve2d curve3d projectionSketchPlane ->
+            let
+                mirroredSketchPlane =
+                    Frame2d.xy
+                        |> Frame2d.mirrorAcross axis
+                        |> Frame2d.placeOnto projectionSketchPlane
+            in
+            ProjectedCurve2d curve3d mirroredSketchPlane
+
+
 curve2dMaxSecondDerivativeMagnitude : Curve2d -> Float
 curve2dMaxSecondDerivativeMagnitude curve2d =
     case curve2d of

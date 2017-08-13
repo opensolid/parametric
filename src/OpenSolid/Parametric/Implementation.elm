@@ -56,6 +56,7 @@ type Region2d
     = RectangleRegion Rectangle2d { left : EdgeType, right : EdgeType, top : EdgeType, bottom : EdgeType }
     | ExtrusionRegion Curve2d Vector2d { start : EdgeType, end : EdgeType, left : EdgeType, right : EdgeType }
     | RevolutionRegion Curve2d Point2d Float { start : EdgeType, end : EdgeType, inside : EdgeType, outside : EdgeType }
+    | FanRegion Point2d Curve2d { start : EdgeType, end : EdgeType, curve : EdgeType }
     | Fused (List Region2d)
 
 
@@ -1326,9 +1327,51 @@ regionBoundaries region =
             in
             List.filterMap identity
                 [ startCurve
+                , outsideCurve
                 , endCurve
                 , insideCurve
+                ]
+
+        FanRegion point curve2d edgeTypes ->
+            let
+                startCurve =
+                    case edgeTypes.start of
+                        Exterior ->
+                            let
+                                lineSegment =
+                                    LineSegment2d
+                                        ( point, curve2dStartPoint curve2d )
+                            in
+                            Just (LineSegment2dCurve lineSegment)
+
+                        Interior ->
+                            Nothing
+
+                endCurve =
+                    case edgeTypes.start of
+                        Exterior ->
+                            let
+                                lineSegment =
+                                    LineSegment2d
+                                        ( curve2dEndPoint curve2d, point )
+                            in
+                            Just (LineSegment2dCurve lineSegment)
+
+                        Interior ->
+                            Nothing
+
+                outsideCurve =
+                    case edgeTypes.curve of
+                        Exterior ->
+                            Just curve2d
+
+                        Interior ->
+                            Nothing
+            in
+            List.filterMap identity
+                [ startCurve
                 , outsideCurve
+                , endCurve
                 ]
 
         Fused regions ->

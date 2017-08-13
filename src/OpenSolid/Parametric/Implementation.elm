@@ -16,6 +16,7 @@ import OpenSolid.Mesh as Mesh exposing (Mesh)
 import OpenSolid.Plane3d as Plane3d
 import OpenSolid.Point2d as Point2d
 import OpenSolid.Point3d as Point3d
+import OpenSolid.Polyline2d as Polyline2d
 import OpenSolid.QuadraticSpline2d as QuadraticSpline2d
 import OpenSolid.QuadraticSpline3d as QuadraticSpline3d
 import OpenSolid.Rectangle2d as Rectangle2d
@@ -1376,3 +1377,176 @@ regionBoundaries region =
 
         Fused regions ->
             List.concat (List.map regionBoundaries regions)
+
+
+regionToMesh : Float -> Region2d -> Mesh Point2d
+regionToMesh tolerance region =
+    case region of
+        RectangleRegion rectangle _ ->
+            let
+                ( p0, p1, p2, p3 ) =
+                    Rectangle2d.vertices rectangle
+
+                vertexList =
+                    [ p0, p1, p2, p3 ]
+
+                faceIndices =
+                    if Frame2d.isRightHanded (Rectangle2d.axes rectangle) then
+                        [ ( 0, 1, 2 ), ( 0, 2, 3 ) ]
+                    else
+                        [ ( 0, 2, 1 ), ( 0, 3, 2 ) ]
+            in
+            Mesh.fromList vertexList faceIndices
+
+        ExtrusionRegion curve2d extrusionVector _ ->
+            let
+                startVertices =
+                    curve2dToPolyline tolerance curve2d
+                        |> Polyline2d.vertices
+
+                endVertices =
+                    List.map (Point2d.translateBy extrusionVector) startVertices
+
+                numColumns =
+                    List.length startVertices - 1
+
+                accumulate startVertices endVertices result =
+                    case ( startVertices, endVertices ) of
+                        ( startFirst :: startRest, endFirst :: endRest ) ->
+                            accumulate
+                                startRest
+                                endRest
+                                (startFirst :: endFirst :: result)
+
+                        _ ->
+                            result
+
+                vertices =
+                    accumulate startVertices endVertices []
+
+                prependFaces columnIndex faces =
+                    if columnIndex < numColumns then
+                        let
+                            offset =
+                                2 * columnIndex
+
+                            faceIndices1 =
+                                ( offset, offset + 2, offset + 3 )
+
+                            faceIndices2 =
+                                ( offset, offset + 3, offset + 1 )
+                        in
+                        prependFaces (columnIndex + 1)
+                            (faceIndices1 :: faceIndices2 :: faces)
+                    else
+                        faces
+
+                faceIndices =
+                    prependFaces 0 []
+            in
+            Mesh.fromList vertices faceIndices
+
+        RevolutionRegion curve2d centerPoint sweptAngle _ ->
+            let
+                insidePoint =
+                    curve2dStartPoint curve2d
+
+                outsidePoint =
+                    curve2dEndPoint curve2d
+
+                outsideRadius =
+                    Point2d.distanceFrom centerPoint outsidePoint
+
+                numRotationSteps =
+                    curveNumSegments tolerance
+                        (outsideRadius * sweptAngle * sweptAngle)
+
+                startCurve =
+                    if sweptAngle >= 0.0 then
+                        curve2d
+                    else
+                        curve2dReverse curve2d
+
+                startVertices =
+                    curve2dToPolyline tolerance startCurve
+                        |> Polyline2d.vertices
+
+                rotationAngles =
+                    List.range 1 numRotationSteps
+                        |> List.map
+                            (\index ->
+                                sweptAngle
+                                    * (toFloat index / toFloat numRotationSteps)
+                            )
+
+                rotatedVertexLists =
+                    rotationAngles
+                        |> List.map
+                            (\angle ->
+                                startVertices
+                                    |> List.map
+                                        (Point2d.rotateAround centerPoint angle)
+                            )
+
+                vertices =
+                    List.concat (startVertices :: rotatedVertexLists)
+
+                numColumns =
+                    List.length startVertices - 1
+
+                numRows =
+                    numRotationSteps
+
+                prependFaces rowIndex columnIndex faces =
+                    if columnIndex < numColumns then
+                        let
+                            i1 =
+                                rowIndex * (numColumns + 1) + columnIndex
+
+                            i2 =
+                                i1 + 1
+
+                            i4 =
+                                i2 + numColumns
+
+                            i3 =
+                                i4 + 1
+
+                            faceIndices1 =
+                                ( i1, i2, i3 )
+
+                            faceIndices2 =
+                                ( i1, i3, i4 )
+                        in
+                        prependFaces
+                            rowIndex
+                            (columnIndex + 1)
+                            (faceIndices1 :: faceIndices2 :: faces)
+                    else if rowIndex < (numRows - 1) then
+                        prependFaces (rowIndex + 1) 0 faces
+                    else
+                        faces
+
+                faceIndices =
+                    prependFaces 0 0 []
+            in
+            Mesh.fromList vertices faceIndices
+
+        FanRegion point curve2d _ ->
+            let
+                curveVertices =
+                    curve2dToPolyline tolerance curve2d |> Polyline2d.vertices
+
+                numFaces =
+                    List.length curveVertices - 1
+
+                toFaceIndices faceIndex =
+                    ( 0, faceIndex + 1, faceIndex + 2 )
+
+                faceIndices =
+                    List.range 0 (numFaces - 1) |> List.map toFaceIndices
+            in
+            Mesh.fromList (point :: curveVertices) faceIndices
+
+        Fused regions ->
+            Mesh.merge (List.map (regionToMesh tolerance) regions)

@@ -8,9 +8,11 @@ module OpenSolid.Region2d
         , interior
         , rectangle
         , rectangleWith
+        , toMesh
         )
 
 import OpenSolid.Geometry.Types exposing (..)
+import OpenSolid.Mesh exposing (Mesh)
 import OpenSolid.Parametric.Implementation as Implementation
 import OpenSolid.Parametric.Types exposing (..)
 import OpenSolid.Rectangle2d as Rectangle2d
@@ -88,3 +90,8 @@ revolutionWith =
 boundaries : Region2d -> List Curve2d
 boundaries =
     Implementation.regionBoundaries
+
+
+toMesh : Float -> Region2d -> Mesh Point2d
+toMesh =
+    Implementation.regionToMesh

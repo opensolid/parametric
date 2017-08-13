@@ -8,6 +8,7 @@ module OpenSolid.Region2d
         , interior
         , rectangle
         , rectangleWith
+        , rotateAround
         , toMesh
         , translateBy
         )
@@ -101,3 +102,8 @@ toMesh =
 translateBy : Vector2d -> Region2d -> Region2d
 translateBy =
     Implementation.regionTranslateBy
+
+
+rotateAround : Point2d -> Float -> Region2d -> Region2d
+rotateAround =
+    Implementation.regionRotateAround

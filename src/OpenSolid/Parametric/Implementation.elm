@@ -1581,3 +1581,34 @@ regionTranslateBy displacement region =
 
         Fused regions ->
             Fused (List.map (regionTranslateBy displacement) regions)
+
+
+regionRotateAround : Point2d -> Float -> Region2d -> Region2d
+regionRotateAround point angle region =
+    case region of
+        RectangleRegion rectangle edgeTypes ->
+            RectangleRegion
+                (Rectangle2d.rotateAround point angle rectangle)
+                edgeTypes
+
+        ExtrusionRegion curve2d extrusionVector edgeTypes ->
+            ExtrusionRegion
+                (curve2dRotateAround point angle curve2d)
+                (Vector2d.rotateBy angle extrusionVector)
+                edgeTypes
+
+        RevolutionRegion curve2d centerPoint sweptAngle edgeTypes ->
+            RevolutionRegion
+                (curve2dRotateAround point angle curve2d)
+                (Point2d.rotateAround point angle centerPoint)
+                sweptAngle
+                edgeTypes
+
+        FanRegion fanPoint curve2d edgeTypes ->
+            FanRegion
+                (Point2d.rotateAround point angle fanPoint)
+                (curve2dRotateAround point angle curve2d)
+                edgeTypes
+
+        Fused regions ->
+            Fused (List.map (regionRotateAround point angle) regions)

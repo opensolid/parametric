@@ -6,6 +6,7 @@ module OpenSolid.Region2d
         , fromRectangle
         , fromRectangleWith
         , interior
+        , mirrorAcross
         , rectangle
         , rectangleWith
         , rotateAround
@@ -107,3 +108,8 @@ translateBy =
 rotateAround : Point2d -> Float -> Region2d -> Region2d
 rotateAround =
     Implementation.regionRotateAround
+
+
+mirrorAcross : Axis2d -> Region2d -> Region2d
+mirrorAcross =
+    Implementation.regionMirrorAcross

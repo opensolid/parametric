@@ -1641,3 +1641,34 @@ regionRotateAround point angle region =
 
         Fused regions ->
             Fused (List.map (regionRotateAround point angle) regions)
+
+
+regionMirrorAcross : Axis2d -> Region2d -> Region2d
+regionMirrorAcross axis region =
+    case region of
+        RectangleRegion rectangle edgeTypes ->
+            RectangleRegion
+                (Rectangle2d.mirrorAcross axis rectangle)
+                edgeTypes
+
+        ExtrusionRegion curve2d extrusionVector edgeTypes ->
+            ExtrusionRegion
+                (curve2d |> curve2dMirrorAcross axis |> curve2dReverse)
+                (Vector2d.mirrorAcross axis extrusionVector)
+                edgeTypes
+
+        RevolutionRegion curve2d centerPoint sweptAngle edgeTypes ->
+            RevolutionRegion
+                (curve2d |> curve2dMirrorAcross axis)
+                (Point2d.mirrorAcross axis centerPoint)
+                -sweptAngle
+                edgeTypes
+
+        FanRegion point curve2d edgeTypes ->
+            FanRegion
+                (Point2d.mirrorAcross axis point)
+                (curve2d |> curve2dMirrorAcross axis |> curve2dReverse)
+                edgeTypes
+
+        Fused regions ->
+            Fused (List.map (regionMirrorAcross axis) regions)

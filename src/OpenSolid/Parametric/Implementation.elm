@@ -1095,6 +1095,59 @@ surface3dRotateAround axis angle surface =
                 (rotateVector vVector)
 
 
+regionExtrusionWith : { start : EdgeType, end : EdgeType, left : EdgeType, right : EdgeType } -> Curve2d -> Vector2d -> Region2d
+regionExtrusionWith edgeTypes curve2d extrusionVector =
+    let
+        startPoint =
+            curve2dStartPoint curve2d
+
+        endPoint =
+            curve2dEndPoint curve2d
+
+        crossProduct =
+            Vector2d.crossProduct
+                (Vector2d.from startPoint endPoint)
+                extrusionVector
+
+        leftToRight =
+            crossProduct >= 0
+
+        startCurve =
+            if leftToRight then
+                curve2d
+            else
+                curve2dReverse curve2d
+    in
+    ExtrusionRegion startCurve extrusionVector edgeTypes
+
+
+regionRevolutionWith : { start : EdgeType, end : EdgeType, inside : EdgeType, outside : EdgeType } -> Curve2d -> Point2d -> Float -> Region2d
+regionRevolutionWith edgeTypes curve2d centerPoint sweptAngle =
+    let
+        startPoint =
+            curve2dStartPoint curve2d
+
+        endPoint =
+            curve2dEndPoint curve2d
+
+        startSquaredRadius =
+            Point2d.squaredDistanceFrom centerPoint startPoint
+
+        endSquaredRadius =
+            Point2d.squaredDistanceFrom centerPoint endPoint
+
+        insideToOutside =
+            startSquaredRadius <= endSquaredRadius
+
+        startCurve =
+            if insideToOutside then
+                curve2d
+            else
+                curve2dReverse curve2d
+    in
+    RevolutionRegion startCurve centerPoint sweptAngle edgeTypes
+
+
 regionBoundaries : Region2d -> List Curve2d
 regionBoundaries region =
     case region of

@@ -55,6 +55,36 @@ fromRectangleWith edgeTypes rectangle =
     Implementation.RectangleRegion rectangle edgeTypes
 
 
+extrusion : Curve2d -> Vector2d -> Region2d
+extrusion =
+    extrusionWith
+        { start = exterior
+        , end = exterior
+        , left = exterior
+        , right = exterior
+        }
+
+
+extrusionWith : { start : EdgeType, end : EdgeType, left : EdgeType, right : EdgeType } -> Curve2d -> Vector2d -> Region2d
+extrusionWith =
+    Implementation.regionExtrusionWith
+
+
+revolution : Curve2d -> Point2d -> Float -> Region2d
+revolution =
+    revolutionWith
+        { start = exterior
+        , end = exterior
+        , inside = exterior
+        , outside = exterior
+        }
+
+
+revolutionWith : { start : EdgeType, end : EdgeType, inside : EdgeType, outside : EdgeType } -> Curve2d -> Point2d -> Float -> Region2d
+revolutionWith =
+    Implementation.regionRevolutionWith
+
+
 boundaries : Region2d -> List Curve2d
 boundaries =
     Implementation.regionBoundaries

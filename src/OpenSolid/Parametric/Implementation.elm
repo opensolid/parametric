@@ -145,6 +145,25 @@ curve2dEvaluate curve2d =
                    )
 
 
+curve2dReverse : Curve2d -> Curve2d
+curve2dReverse curve2d =
+    case curve2d of
+        LineSegment2dCurve lineSegment2d ->
+            LineSegment2dCurve (LineSegment2d.reverse lineSegment2d)
+
+        Arc2dCurve arc2d ->
+            Arc2dCurve (Arc2d.reverse arc2d)
+
+        QuadraticSpline2dCurve quadraticSpline2d ->
+            QuadraticSpline2dCurve (QuadraticSpline2d.reverse quadraticSpline2d)
+
+        CubicSpline2dCurve cubicSpline2d ->
+            CubicSpline2dCurve (CubicSpline2d.reverse cubicSpline2d)
+
+        ProjectedCurve2d curve3d sketchPlane ->
+            ProjectedCurve2d (curve3dReverse curve3d) sketchPlane
+
+
 curve2dPlaceIn : Frame2d -> Curve2d -> Curve2d
 curve2dPlaceIn frame curve2d =
     case curve2d of
@@ -481,6 +500,28 @@ curve3dEvaluate curve3d =
                         , Vector3d.projectOnto plane unprojectedVector3d
                         )
                    )
+
+
+curve3dReverse : Curve3d -> Curve3d
+curve3dReverse curve3d =
+    case curve3d of
+        LineSegment3dCurve lineSegment3d ->
+            LineSegment3dCurve (LineSegment3d.reverse lineSegment3d)
+
+        Arc3dCurve arc3d ->
+            Arc3dCurve (Arc3d.reverse arc3d)
+
+        QuadraticSpline3dCurve quadraticSpline3d ->
+            QuadraticSpline3dCurve (QuadraticSpline3d.reverse quadraticSpline3d)
+
+        CubicSpline3dCurve cubicSpline3d ->
+            CubicSpline3dCurve (CubicSpline3d.reverse cubicSpline3d)
+
+        PlacedCurve3d curve2d sketchPlane ->
+            PlacedCurve3d (curve2dReverse curve2d) sketchPlane
+
+        ProjectedCurve3d unprojectedCurve3d plane ->
+            ProjectedCurve3d (curve3dReverse unprojectedCurve3d) plane
 
 
 curve3dProjectOnto : Plane3d -> Curve3d -> Curve3d

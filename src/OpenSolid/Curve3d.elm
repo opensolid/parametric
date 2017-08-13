@@ -14,6 +14,7 @@ module OpenSolid.Curve3d
         , projectOnto
         , quadraticSpline
         , relativeTo
+        , reverse
         , revolveAround
         , rotateAround
         , startPoint
@@ -119,3 +120,8 @@ startPoint =
 endPoint : Curve3d -> Point3d
 endPoint =
     Implementation.curve3dEndPoint
+
+
+reverse : Curve3d -> Curve3d
+reverse =
+    Implementation.curve3dReverse

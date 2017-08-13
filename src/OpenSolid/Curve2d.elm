@@ -13,6 +13,7 @@ module OpenSolid.Curve2d
         , pointOn
         , quadraticSpline
         , relativeTo
+        , reverse
         , rotateAround
         , startPoint
         , toPolyline
@@ -107,3 +108,8 @@ startPoint =
 endPoint : Curve2d -> Point2d
 endPoint =
     Implementation.curve2dEndPoint
+
+
+reverse : Curve2d -> Curve2d
+reverse =
+    Implementation.curve2dReverse

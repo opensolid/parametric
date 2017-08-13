@@ -54,7 +54,6 @@ type EdgeType
 
 type Region2d
     = RectangleRegion Rectangle2d { left : EdgeType, right : EdgeType, top : EdgeType, bottom : EdgeType }
-    | CircleRegion Circle2d
     | ExtrusionRegion Curve2d Vector2d { start : EdgeType, end : EdgeType, left : EdgeType, right : EdgeType }
     | RevolutionRegion Curve2d Point2d Float { start : EdgeType, end : EdgeType, inside : EdgeType, outside : EdgeType }
     | Fused (List Region2d)
@@ -1172,9 +1171,6 @@ regionBoundaries region =
                 , boundaryCurve edgeTypes.top p3 p4
                 , boundaryCurve edgeTypes.left p4 p1
                 ]
-
-        CircleRegion circle ->
-            [ Arc2dCurve (Circle2d.toArc circle) ]
 
         ExtrusionRegion curve2d extrusionVector edgeTypes ->
             let

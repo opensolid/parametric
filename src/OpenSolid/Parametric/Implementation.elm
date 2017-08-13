@@ -1550,3 +1550,34 @@ regionToMesh tolerance region =
 
         Fused regions ->
             Mesh.merge (List.map (regionToMesh tolerance) regions)
+
+
+regionTranslateBy : Vector2d -> Region2d -> Region2d
+regionTranslateBy displacement region =
+    case region of
+        RectangleRegion rectangle edgeTypes ->
+            RectangleRegion
+                (Rectangle2d.translateBy displacement rectangle)
+                edgeTypes
+
+        ExtrusionRegion curve2d extrusionVector edgeTypes ->
+            ExtrusionRegion
+                (curve2dTranslateBy displacement curve2d)
+                extrusionVector
+                edgeTypes
+
+        RevolutionRegion curve2d centerPoint sweptAngle edgeTypes ->
+            RevolutionRegion
+                (curve2dTranslateBy displacement curve2d)
+                (Point2d.translateBy displacement centerPoint)
+                sweptAngle
+                edgeTypes
+
+        FanRegion point curve2d edgeTypes ->
+            FanRegion
+                (Point2d.translateBy displacement point)
+                (curve2dTranslateBy displacement curve2d)
+                edgeTypes
+
+        Fused regions ->
+            Fused (List.map (regionTranslateBy displacement) regions)

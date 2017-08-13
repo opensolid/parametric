@@ -9,6 +9,7 @@ module OpenSolid.Region2d
         , rectangle
         , rectangleWith
         , toMesh
+        , translateBy
         )
 
 import OpenSolid.Geometry.Types exposing (..)
@@ -95,3 +96,8 @@ boundaries =
 toMesh : Float -> Region2d -> Mesh Point2d
 toMesh =
     Implementation.regionToMesh
+
+
+translateBy : Vector2d -> Region2d -> Region2d
+translateBy =
+    Implementation.regionTranslateBy

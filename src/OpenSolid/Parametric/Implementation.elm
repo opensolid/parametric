@@ -1205,10 +1205,10 @@ regionBoundaries region =
                     ]
             else
                 List.filterMap identity
-                    [ boundaryCurve edgeTypes.bottom p1 p4
-                    , boundaryCurve edgeTypes.right p4 p3
-                    , boundaryCurve edgeTypes.top p3 p2
-                    , boundaryCurve edgeTypes.left p2 p1
+                    [ boundaryCurve edgeTypes.bottom p2 p1
+                    , boundaryCurve edgeTypes.right p3 p2
+                    , boundaryCurve edgeTypes.top p4 p3
+                    , boundaryCurve edgeTypes.left p1 p4
                     ]
 
         ExtrusionRegion curve2d extrusionVector edgeTypes ->

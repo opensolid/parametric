@@ -1,12 +1,21 @@
 module OpenSolid.Curve2d
     exposing
-        ( arc
+        ( Clause
+        , If
+        , arc
         , cubicSpline
+        , elseIf
+        , else_
         , endPoint
         , fromArc
         , fromCubicSpline
         , fromLineSegment
         , fromQuadraticSpline
+        , if_
+        , isArc
+        , isCubicSpline
+        , isLineSegment
+        , isQuadraticSpline
         , lineSegment
         , mirrorAcross
         , placeIn
@@ -119,3 +128,95 @@ endPoint =
 reverse : Curve2d -> Curve2d
 reverse =
     Implementation.curve2dReverse
+
+
+type If a
+    = If (List (Clause a))
+
+
+type Clause a
+    = ArcClause (Arc2d -> a)
+    | LineSegmentClause (LineSegment2d -> a)
+    | QuadraticSplineClause (QuadraticSpline2d -> a)
+    | CubicSplineClause (CubicSpline2d -> a)
+
+
+if_ : Clause a -> If a
+if_ clause =
+    If [ clause ]
+
+
+elseIf : Clause a -> If a -> If a
+elseIf clause (If clauses) =
+    If (clause :: clauses)
+
+
+else_ : (Curve2d -> a) -> If a -> Curve2d -> a
+else_ fallback (If clauses) =
+    let
+        defaultHandler _ curve =
+            fallback curve
+
+        initialHandlers =
+            { handleArc = defaultHandler
+            , handleLineSegment = defaultHandler
+            , handleQuadraticSpline = defaultHandler
+            , handleCubicSpline = defaultHandler
+            }
+
+        wrap handler argument _ =
+            handler argument
+
+        updateHandlers clause handlers =
+            case clause of
+                ArcClause handler ->
+                    { handlers | handleArc = wrap handler }
+
+                LineSegmentClause handler ->
+                    { handlers | handleLineSegment = wrap handler }
+
+                QuadraticSplineClause handler ->
+                    { handlers | handleQuadraticSpline = wrap handler }
+
+                CubicSplineClause handler ->
+                    { handlers | handleCubicSpline = wrap handler }
+
+        { handleArc, handleLineSegment, handleQuadraticSpline, handleCubicSpline } =
+            List.foldl updateHandlers initialHandlers clauses
+    in
+    \curve ->
+        case curve of
+            Implementation.LineSegment2dCurve lineSegment ->
+                handleLineSegment lineSegment curve
+
+            Implementation.Arc2dCurve arc ->
+                handleArc arc curve
+
+            Implementation.QuadraticSpline2dCurve quadraticSpline ->
+                handleQuadraticSpline quadraticSpline curve
+
+            Implementation.CubicSpline2dCurve cubicSpline ->
+                handleCubicSpline cubicSpline curve
+
+            _ ->
+                fallback curve
+
+
+isLineSegment : (LineSegment2d -> a) -> Clause a
+isLineSegment =
+    LineSegmentClause
+
+
+isArc : (Arc2d -> a) -> Clause a
+isArc =
+    ArcClause
+
+
+isQuadraticSpline : (QuadraticSpline2d -> a) -> Clause a
+isQuadraticSpline =
+    QuadraticSplineClause
+
+
+isCubicSpline : (CubicSpline2d -> a) -> Clause a
+isCubicSpline =
+    CubicSplineClause

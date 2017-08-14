@@ -7,6 +7,7 @@ module OpenSolid.Region2d
         , extrusionWith
         , fromRectangle
         , fromRectangleWith
+        , fuse
         , interior
         , mirrorAcross
         , rectangle
@@ -117,3 +118,8 @@ rotateAround =
 mirrorAcross : Axis2d -> Region2d -> Region2d
 mirrorAcross =
     Implementation.regionMirrorAcross
+
+
+fuse : List Region2d -> Region2d
+fuse =
+    Implementation.Fused

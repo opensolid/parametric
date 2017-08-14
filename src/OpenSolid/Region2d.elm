@@ -3,12 +3,16 @@ module OpenSolid.Region2d
         ( EdgeType
         , boundaries
         , exterior
+        , extrusion
+        , extrusionWith
         , fromRectangle
         , fromRectangleWith
         , interior
         , mirrorAcross
         , rectangle
         , rectangleWith
+        , revolution
+        , revolutionWith
         , rotateAround
         , toMesh
         , translateBy

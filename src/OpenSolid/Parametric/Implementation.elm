@@ -66,6 +66,10 @@ type Region2d
     | Fused (List Region2d)
 
 
+type Body3d
+    = Body3d (List Surface3d)
+
+
 curve2dStartPoint : Curve2d -> Point2d
 curve2dStartPoint curve2d =
     case curve2d of

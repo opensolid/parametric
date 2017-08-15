@@ -21,3 +21,7 @@ type alias Region2d =
 
 type alias BoundaryType =
     Implementation.BoundaryType
+
+
+type alias Body3d =
+    Implementation.Body3d

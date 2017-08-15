@@ -351,10 +351,10 @@ curve2dMaxSecondDerivativeMagnitude curve2d =
                     QuadraticSpline2d.controlPoints quadraticSpline2d
 
                 v1 =
-                    Point2d.vectorFrom p1 p2
+                    Vector2d.from p1 p2
 
                 v2 =
-                    Point2d.vectorFrom p2 p3
+                    Vector2d.from p2 p3
             in
             2 * Vector2d.length (Vector2d.difference v2 v1)
 
@@ -364,13 +364,13 @@ curve2dMaxSecondDerivativeMagnitude curve2d =
                     CubicSpline2d.controlPoints cubicSpline2d
 
                 u1 =
-                    Point2d.vectorFrom p1 p2
+                    Vector2d.from p1 p2
 
                 u2 =
-                    Point2d.vectorFrom p2 p3
+                    Vector2d.from p2 p3
 
                 u3 =
-                    Point2d.vectorFrom p3 p4
+                    Vector2d.from p3 p4
 
                 v1 =
                     Vector2d.difference u2 u1
@@ -709,10 +709,10 @@ curve3dMaxSecondDerivativeMagnitude curve3d =
                     QuadraticSpline3d.controlPoints quadraticSpline3d
 
                 v1 =
-                    Point3d.vectorFrom p1 p2
+                    Vector3d.from p1 p2
 
                 v2 =
-                    Point3d.vectorFrom p2 p3
+                    Vector3d.from p2 p3
             in
             2 * Vector3d.length (Vector3d.difference v2 v1)
 
@@ -722,13 +722,13 @@ curve3dMaxSecondDerivativeMagnitude curve3d =
                     CubicSpline3d.controlPoints cubicSpline3d
 
                 u1 =
-                    Point3d.vectorFrom p1 p2
+                    Vector3d.from p1 p2
 
                 u2 =
-                    Point3d.vectorFrom p2 p3
+                    Vector3d.from p2 p3
 
                 u3 =
-                    Point3d.vectorFrom p3 p4
+                    Vector3d.from p3 p4
 
                 v1 =
                     Vector3d.difference u2 u1
@@ -785,7 +785,7 @@ curve3dExtrudeBy vector curve =
                 ( p0, p1 ) =
                     LineSegment3d.endpoints lineSegment3d
             in
-            ParallelogramSurface p0 (Point3d.vectorFrom p0 p1) vector
+            ParallelogramSurface p0 (Vector3d.from p0 p1) vector
 
         _ ->
             ExtrusionSurface curve vector

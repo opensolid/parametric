@@ -870,6 +870,7 @@ surface3dPointOn surface =
                 Point3d.in_ frame ( x, y, z )
 
         PlanarSurface _ sketchPlane ->
+            -- TODO: interpolate within region bounding box?
             Point2d.placeOnto sketchPlane
 
 

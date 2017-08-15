@@ -1,7 +1,9 @@
 module OpenSolid.Surface3d
     exposing
-        ( pointOn
+        ( extrusion
         , planar
+        , pointOn
+        , revolution
         , rotateAround
         , toMesh
         )
@@ -30,3 +32,13 @@ rotateAround =
 planar : Region2d -> SketchPlane3d -> Surface3d
 planar =
     Implementation.PlanarSurface
+
+
+extrusion : Curve3d -> Vector3d -> Surface3d
+extrusion =
+    Implementation.surface3dExtrusion
+
+
+revolution : Curve3d -> Axis3d -> Float -> Surface3d
+revolution =
+    Implementation.surface3dRevolution

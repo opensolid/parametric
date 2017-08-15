@@ -3,7 +3,6 @@ module OpenSolid.Curve3d
         ( arc
         , cubicSpline
         , endPoint
-        , extrudeBy
         , fromArc
         , fromCubicSpline
         , fromLineSegment
@@ -15,7 +14,6 @@ module OpenSolid.Curve3d
         , quadraticSpline
         , relativeTo
         , reverse
-        , revolveAround
         , rotateAround
         , startPoint
         , toPolyline
@@ -85,16 +83,6 @@ relativeTo =
 placeIn : Frame3d -> Curve3d -> Curve3d
 placeIn =
     Implementation.curve3dPlaceIn
-
-
-extrudeBy : Vector3d -> Curve3d -> Surface3d
-extrudeBy =
-    Implementation.curve3dExtrudeBy
-
-
-revolveAround : Axis3d -> Float -> Curve3d -> Surface3d
-revolveAround =
-    Implementation.curve3dRevolveAround
 
 
 toPolyline : Float -> Curve3d -> Polyline3d

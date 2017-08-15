@@ -778,8 +778,8 @@ curve3dSamples tolerance curve3d =
     parameterValues |> List.map (curve3dEvaluate curve3d)
 
 
-curve3dExtrudeBy : Vector3d -> Curve3d -> Surface3d
-curve3dExtrudeBy vector curve =
+surface3dExtrusion : Curve3d -> Vector3d -> Surface3d
+surface3dExtrusion curve vector =
     case curve of
         LineSegment3dCurve lineSegment3d ->
             let
@@ -792,8 +792,8 @@ curve3dExtrudeBy vector curve =
             ExtrusionSurface curve vector
 
 
-curve3dRevolveAround : Axis3d -> Float -> Curve3d -> Surface3d
-curve3dRevolveAround axis angle curve =
+surface3dRevolution : Curve3d -> Axis3d -> Float -> Surface3d
+surface3dRevolution curve axis angle =
     let
         zDirection =
             Axis3d.direction axis

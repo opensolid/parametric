@@ -1,14 +1,11 @@
 module OpenSolid.Region2d
     exposing
-        ( EdgeType
-        , boundaries
-        , exterior
+        ( boundaries
         , extrusion
         , extrusionWith
         , fromRectangle
         , fromRectangleWith
         , fuse
-        , interior
         , mirrorAcross
         , rectangle
         , rectangleWith
@@ -19,6 +16,7 @@ module OpenSolid.Region2d
         , translateBy
         )
 
+import OpenSolid.BoundaryType as BoundaryType
 import OpenSolid.Geometry.Types exposing (..)
 import OpenSolid.Mesh exposing (Mesh)
 import OpenSolid.Parametric.Implementation as Implementation
@@ -26,26 +24,12 @@ import OpenSolid.Parametric.Types exposing (..)
 import OpenSolid.Rectangle2d as Rectangle2d
 
 
-type alias EdgeType =
-    Implementation.EdgeType
-
-
-interior : EdgeType
-interior =
-    Implementation.Interior
-
-
-exterior : EdgeType
-exterior =
-    Implementation.Exterior
-
-
 rectangle : { minX : Float, maxX : Float, minY : Float, maxY : Float } -> Region2d
 rectangle extrema =
     fromRectangle (Rectangle2d.with extrema)
 
 
-rectangleWith : { left : EdgeType, right : EdgeType, top : EdgeType, bottom : EdgeType } -> { minX : Float, maxX : Float, minY : Float, maxY : Float } -> Region2d
+rectangleWith : { left : BoundaryType, right : BoundaryType, top : BoundaryType, bottom : BoundaryType } -> { minX : Float, maxX : Float, minY : Float, maxY : Float } -> Region2d
 rectangleWith edgeTypes extrema =
     fromRectangleWith edgeTypes (Rectangle2d.with extrema)
 
@@ -53,14 +37,14 @@ rectangleWith edgeTypes extrema =
 fromRectangle : Rectangle2d -> Region2d
 fromRectangle =
     fromRectangleWith
-        { left = exterior
-        , right = exterior
-        , top = exterior
-        , bottom = exterior
+        { left = BoundaryType.exterior
+        , right = BoundaryType.exterior
+        , top = BoundaryType.exterior
+        , bottom = BoundaryType.exterior
         }
 
 
-fromRectangleWith : { left : EdgeType, right : EdgeType, top : EdgeType, bottom : EdgeType } -> Rectangle2d -> Region2d
+fromRectangleWith : { left : BoundaryType, right : BoundaryType, top : BoundaryType, bottom : BoundaryType } -> Rectangle2d -> Region2d
 fromRectangleWith edgeTypes rectangle =
     Implementation.RectangleRegion rectangle edgeTypes
 
@@ -68,14 +52,14 @@ fromRectangleWith edgeTypes rectangle =
 extrusion : Curve2d -> Vector2d -> Region2d
 extrusion =
     extrusionWith
-        { start = exterior
-        , end = exterior
-        , left = exterior
-        , right = exterior
+        { start = BoundaryType.exterior
+        , end = BoundaryType.exterior
+        , left = BoundaryType.exterior
+        , right = BoundaryType.exterior
         }
 
 
-extrusionWith : { start : EdgeType, end : EdgeType, left : EdgeType, right : EdgeType } -> Curve2d -> Vector2d -> Region2d
+extrusionWith : { start : BoundaryType, end : BoundaryType, left : BoundaryType, right : BoundaryType } -> Curve2d -> Vector2d -> Region2d
 extrusionWith =
     Implementation.regionExtrusionWith
 
@@ -83,14 +67,14 @@ extrusionWith =
 revolution : Curve2d -> Point2d -> Float -> Region2d
 revolution =
     revolutionWith
-        { start = exterior
-        , end = exterior
-        , inside = exterior
-        , outside = exterior
+        { start = BoundaryType.exterior
+        , end = BoundaryType.exterior
+        , inside = BoundaryType.exterior
+        , outside = BoundaryType.exterior
         }
 
 
-revolutionWith : { start : EdgeType, end : EdgeType, inside : EdgeType, outside : EdgeType } -> Curve2d -> Point2d -> Float -> Region2d
+revolutionWith : { start : BoundaryType, end : BoundaryType, inside : BoundaryType, outside : BoundaryType } -> Curve2d -> Point2d -> Float -> Region2d
 revolutionWith =
     Implementation.regionRevolutionWith
 

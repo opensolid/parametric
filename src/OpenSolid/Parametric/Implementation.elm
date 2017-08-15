@@ -49,16 +49,16 @@ type Surface3d
     | PlanarSurface Region2d SketchPlane3d
 
 
-type EdgeType
+type BoundaryType
     = Interior
     | Exterior
 
 
 type Region2d
-    = RectangleRegion Rectangle2d { left : EdgeType, right : EdgeType, top : EdgeType, bottom : EdgeType }
-    | ExtrusionRegion Curve2d Vector2d { start : EdgeType, end : EdgeType, left : EdgeType, right : EdgeType }
-    | RevolutionRegion Curve2d Point2d Float { start : EdgeType, end : EdgeType, inside : EdgeType, outside : EdgeType }
-    | FanRegion Point2d Curve2d { start : EdgeType, end : EdgeType, curve : EdgeType }
+    = RectangleRegion Rectangle2d { left : BoundaryType, right : BoundaryType, top : BoundaryType, bottom : BoundaryType }
+    | ExtrusionRegion Curve2d Vector2d { start : BoundaryType, end : BoundaryType, left : BoundaryType, right : BoundaryType }
+    | RevolutionRegion Curve2d Point2d Float { start : BoundaryType, end : BoundaryType, inside : BoundaryType, outside : BoundaryType }
+    | FanRegion Point2d Curve2d { start : BoundaryType, end : BoundaryType, curve : BoundaryType }
     | Fused (List Region2d)
 
 
@@ -1148,7 +1148,7 @@ surface3dRotateAround axis angle surface =
                 (SketchPlane3d.rotateAround axis angle sketchPlane)
 
 
-regionExtrusionWith : { start : EdgeType, end : EdgeType, left : EdgeType, right : EdgeType } -> Curve2d -> Vector2d -> Region2d
+regionExtrusionWith : { start : BoundaryType, end : BoundaryType, left : BoundaryType, right : BoundaryType } -> Curve2d -> Vector2d -> Region2d
 regionExtrusionWith edgeTypes curve2d extrusionVector =
     let
         startPoint =
@@ -1174,7 +1174,7 @@ regionExtrusionWith edgeTypes curve2d extrusionVector =
     ExtrusionRegion startCurve extrusionVector edgeTypes
 
 
-regionRevolutionWith : { start : EdgeType, end : EdgeType, inside : EdgeType, outside : EdgeType } -> Curve2d -> Point2d -> Float -> Region2d
+regionRevolutionWith : { start : BoundaryType, end : BoundaryType, inside : BoundaryType, outside : BoundaryType } -> Curve2d -> Point2d -> Float -> Region2d
 regionRevolutionWith edgeTypes curve2d centerPoint sweptAngle =
     let
         startPoint =

@@ -849,10 +849,10 @@ surface3dPointOn surface =
             \(Point2d ( u, v )) ->
                 let
                     ( x0, y0, z ) =
-                        Point3d.coordinates (pointOnCurve u)
+                        Point3d.coordinates (pointOnCurve v)
 
                     theta =
-                        v * angle
+                        u * angle
 
                     cosTheta =
                         cos theta
@@ -989,12 +989,12 @@ surface3dToMesh tolerance surface3d =
                 numRotationSteps =
                     curveNumSegments tolerance maxSecondDerivativeMagnitude
 
-                toStartVertex ( point, uDerivative ) =
+                toStartVertex ( point, vDerivative ) =
                     let
                         ( x, y, _ ) =
                             Point3d.coordinates point
 
-                        vDerivative =
+                        uDerivative =
                             Vector3d ( sweptAngle * x, sweptAngle * y, 0 )
 
                         normalVector =

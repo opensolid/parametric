@@ -31,7 +31,7 @@ rotateAround =
 
 planar : Region2d -> SketchPlane3d -> Surface3d
 planar =
-    Implementation.PlanarSurface
+    Implementation.surface3dPlanar
 
 
 extrusion : Curve3d -> Vector3d -> Surface3d
@@ -42,3 +42,8 @@ extrusion =
 revolution : Curve3d -> Axis3d -> Float -> Surface3d
 revolution =
     Implementation.surface3dRevolution
+
+
+flip : Surface3d -> Surface3d
+flip =
+    Implementation.surface3dFlip

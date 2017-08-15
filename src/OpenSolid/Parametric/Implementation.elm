@@ -43,6 +43,10 @@ type Curve3d
 
 
 type Surface3d
+    = Surface3d Bool ParametricSurface3d
+
+
+type ParametricSurface3d
     = ExtrusionSurface Curve3d Vector3d
     | RevolutionSurface Curve3d Frame3d Float
     | ParallelogramSurface Point3d Vector3d Vector3d
@@ -786,10 +790,11 @@ surface3dExtrusion curve vector =
                 ( p0, p1 ) =
                     LineSegment3d.endpoints lineSegment3d
             in
-            ParallelogramSurface p0 (Vector3d.from p0 p1) vector
+            Surface3d True
+                (ParallelogramSurface p0 (Vector3d.from p0 p1) vector)
 
         _ ->
-            ExtrusionSurface curve vector
+            Surface3d True (ExtrusionSurface curve vector)
 
 
 surface3dRevolution : Curve3d -> Axis3d -> Float -> Surface3d
@@ -809,11 +814,22 @@ surface3dRevolution curve axis angle =
                 , zDirection = zDirection
                 }
     in
-    RevolutionSurface (curve3dRelativeTo frame curve) frame angle
+    Surface3d True
+        (RevolutionSurface (curve3dRelativeTo frame curve) frame angle)
+
+
+surface3dPlanar : Region2d -> SketchPlane3d -> Surface3d
+surface3dPlanar region sketchPlane =
+    Surface3d True (PlanarSurface region sketchPlane)
+
+
+surface3dFlip : Surface3d -> Surface3d
+surface3dFlip (Surface3d isRightHanded surface) =
+    Surface3d (not isRightHanded) surface
 
 
 surface3dPointOn : Surface3d -> Point2d -> Point3d
-surface3dPointOn surface =
+surface3dPointOn (Surface3d _ surface) =
     case surface of
         ParallelogramSurface point uVector vVector ->
             let
@@ -875,12 +891,16 @@ surface3dPointOn surface =
 
 
 surface3dToMesh : Float -> Surface3d -> Mesh ( Point3d, Vector3d )
-surface3dToMesh tolerance surface3d =
+surface3dToMesh tolerance (Surface3d isRightHanded surface3d) =
     case surface3d of
         ParallelogramSurface point uVector vVector ->
             let
                 n =
-                    Vector3d.normalize (Vector3d.crossProduct uVector vVector)
+                    Vector3d.normalize <|
+                        if isRightHanded then
+                            Vector3d.crossProduct uVector vVector
+                        else
+                            Vector3d.crossProduct vVector uVector
 
                 p0 =
                     point
@@ -898,7 +918,10 @@ surface3dToMesh tolerance surface3d =
                     [ ( p0, n ), ( p1, n ), ( p2, n ), ( p3, n ) ]
 
                 faceIndices =
-                    [ ( 0, 1, 2 ), ( 0, 2, 3 ) ]
+                    if isRightHanded then
+                        [ ( 0, 1, 2 ), ( 0, 2, 3 ) ]
+                    else
+                        [ ( 0, 2, 1 ), ( 0, 3, 2 ) ]
             in
             Mesh.fromList vertices faceIndices
 
@@ -911,9 +934,14 @@ surface3dToMesh tolerance surface3d =
                     let
                         normalVector =
                             Vector3d.normalize <|
-                                Vector3d.crossProduct
-                                    curveDerivative
-                                    extrusionVector
+                                if isRightHanded then
+                                    Vector3d.crossProduct
+                                        curveDerivative
+                                        extrusionVector
+                                else
+                                    Vector3d.crossProduct
+                                        extrusionVector
+                                        curveDerivative
                     in
                     ( curvePoint, normalVector )
 
@@ -952,10 +980,16 @@ surface3dToMesh tolerance surface3d =
                                 2 * columnIndex
 
                             faceIndices1 =
-                                ( offset + 2, offset, offset + 1 )
+                                if isRightHanded then
+                                    ( offset + 2, offset, offset + 1 )
+                                else
+                                    ( offset + 2, offset + 1, offset )
 
                             faceIndices2 =
-                                ( offset + 2, offset + 1, offset + 3 )
+                                if isRightHanded then
+                                    ( offset + 2, offset + 1, offset + 3 )
+                                else
+                                    ( offset + 2, offset + 3, offset + 1 )
                         in
                         prependFaces (columnIndex + 1)
                             (faceIndices1 :: faceIndices2 :: faces)
@@ -1004,7 +1038,14 @@ surface3dToMesh tolerance surface3d =
 
                         normalVector =
                             Vector3d.normalize <|
-                                Vector3d.crossProduct uDerivative vDerivative
+                                if isRightHanded then
+                                    Vector3d.crossProduct
+                                        uDerivative
+                                        vDerivative
+                                else
+                                    Vector3d.crossProduct
+                                        vDerivative
+                                        uDerivative
                     in
                     ( point, normalVector )
 
@@ -1085,10 +1126,16 @@ surface3dToMesh tolerance surface3d =
                                 i3 - 1
 
                             faceIndices1 =
-                                ( i1, i2, i3 )
+                                if isRightHanded then
+                                    ( i1, i2, i3 )
+                                else
+                                    ( i1, i3, i2 )
 
                             faceIndices2 =
-                                ( i1, i3, i4 )
+                                if isRightHanded then
+                                    ( i1, i3, i4 )
+                                else
+                                    ( i1, i4, i3 )
                         in
                         prependFaces
                             rowIndex
@@ -1106,9 +1153,15 @@ surface3dToMesh tolerance surface3d =
 
         PlanarSurface region sketchPlane ->
             let
-                normalVector =
+                planeNormalVector =
                     SketchPlane3d.normalDirection sketchPlane
                         |> Direction3d.toVector
+
+                normalVector =
+                    if isRightHanded then
+                        planeNormalVector
+                    else
+                        Vector3d.flip planeNormalVector
 
                 toVertex3d point =
                     ( Point2d.placeOnto sketchPlane point
@@ -1119,33 +1172,37 @@ surface3dToMesh tolerance surface3d =
 
 
 surface3dRotateAround : Axis3d -> Float -> Surface3d -> Surface3d
-surface3dRotateAround axis angle surface =
+surface3dRotateAround axis angle (Surface3d isRightHanded surface) =
     case surface of
         ExtrusionSurface curve3d extrusionVector ->
-            ExtrusionSurface
-                (curve3dRotateAround axis angle curve3d)
-                (Vector3d.rotateAround axis angle extrusionVector)
+            Surface3d isRightHanded <|
+                ExtrusionSurface
+                    (curve3dRotateAround axis angle curve3d)
+                    (Vector3d.rotateAround axis angle extrusionVector)
 
         RevolutionSurface localCurve3d frame sweptAngle ->
-            RevolutionSurface
-                localCurve3d
-                (Frame3d.rotateAround axis angle frame)
-                sweptAngle
+            Surface3d isRightHanded <|
+                RevolutionSurface
+                    localCurve3d
+                    (Frame3d.rotateAround axis angle frame)
+                    sweptAngle
 
         ParallelogramSurface point uVector vVector ->
             let
                 rotateVector =
                     Vector3d.rotateAround axis angle
             in
-            ParallelogramSurface
-                (Point3d.rotateAround axis angle point)
-                (rotateVector uVector)
-                (rotateVector vVector)
+            Surface3d isRightHanded <|
+                ParallelogramSurface
+                    (Point3d.rotateAround axis angle point)
+                    (rotateVector uVector)
+                    (rotateVector vVector)
 
         PlanarSurface region sketchPlane ->
-            PlanarSurface
-                region
-                (SketchPlane3d.rotateAround axis angle sketchPlane)
+            Surface3d isRightHanded <|
+                PlanarSurface
+                    region
+                    (SketchPlane3d.rotateAround axis angle sketchPlane)
 
 
 regionExtrusionWith : { start : BoundaryType, end : BoundaryType, left : BoundaryType, right : BoundaryType } -> Curve2d -> Vector2d -> Region2d

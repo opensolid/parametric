@@ -46,6 +46,7 @@ type Surface3d
     = ExtrusionSurface Curve3d Vector3d
     | RevolutionSurface Curve3d Frame3d Float
     | ParallelogramSurface Point3d Vector3d Vector3d
+    | PlanarSurface Region2d SketchPlane3d
 
 
 type EdgeType
@@ -868,6 +869,9 @@ surface3dPointOn surface =
                 in
                 Point3d.in_ frame ( x, y, z )
 
+        PlanarSurface _ sketchPlane ->
+            Point2d.placeOnto sketchPlane
+
 
 surface3dToMesh : Float -> Surface3d -> Mesh ( Point3d, Vector3d )
 surface3dToMesh tolerance surface3d =
@@ -1099,6 +1103,19 @@ surface3dToMesh tolerance surface3d =
             in
             Mesh.fromList vertices faceIndices
 
+        PlanarSurface region sketchPlane ->
+            let
+                normalVector =
+                    SketchPlane3d.normalDirection sketchPlane
+                        |> Direction3d.toVector
+
+                toVertex3d point =
+                    ( Point2d.placeOnto sketchPlane point
+                    , normalVector
+                    )
+            in
+            regionToMesh tolerance region |> Mesh.map toVertex3d
+
 
 surface3dRotateAround : Axis3d -> Float -> Surface3d -> Surface3d
 surface3dRotateAround axis angle surface =
@@ -1123,6 +1140,11 @@ surface3dRotateAround axis angle surface =
                 (Point3d.rotateAround axis angle point)
                 (rotateVector uVector)
                 (rotateVector vVector)
+
+        PlanarSurface region sketchPlane ->
+            PlanarSurface
+                region
+                (SketchPlane3d.rotateAround axis angle sketchPlane)
 
 
 regionExtrusionWith : { start : EdgeType, end : EdgeType, left : EdgeType, right : EdgeType } -> Curve2d -> Vector2d -> Region2d

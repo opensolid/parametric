@@ -6,6 +6,7 @@ module OpenSolid.Surface3d
         , revolution
         , rotateAround
         , toMesh
+        , translateBy
         )
 
 import OpenSolid.Geometry.Types exposing (..)
@@ -22,6 +23,11 @@ pointOn =
 toMesh : Float -> Surface3d -> Mesh ( Point3d, Vector3d )
 toMesh =
     Implementation.surface3dToMesh
+
+
+translateBy : Vector3d -> Surface3d -> Surface3d
+translateBy =
+    Implementation.surface3dTranslateBy
 
 
 rotateAround : Axis3d -> Float -> Surface3d -> Surface3d

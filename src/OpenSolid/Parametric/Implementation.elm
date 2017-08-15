@@ -1171,6 +1171,36 @@ surface3dToMesh tolerance (Surface3d isRightHanded surface3d) =
             regionToMesh tolerance region |> Mesh.map toVertex3d
 
 
+surface3dTranslateBy : Vector3d -> Surface3d -> Surface3d
+surface3dTranslateBy displacement (Surface3d isRightHanded surface) =
+    case surface of
+        ExtrusionSurface curve3d extrusionVector ->
+            Surface3d isRightHanded <|
+                ExtrusionSurface
+                    (curve3dTranslateBy displacement curve3d)
+                    extrusionVector
+
+        RevolutionSurface localCurve3d frame sweptAngle ->
+            Surface3d isRightHanded <|
+                RevolutionSurface
+                    localCurve3d
+                    (Frame3d.translateBy displacement frame)
+                    sweptAngle
+
+        ParallelogramSurface point uVector vVector ->
+            Surface3d isRightHanded <|
+                ParallelogramSurface
+                    (Point3d.translateBy displacement point)
+                    uVector
+                    vVector
+
+        PlanarSurface region sketchPlane ->
+            Surface3d isRightHanded <|
+                PlanarSurface
+                    region
+                    (SketchPlane3d.translateBy displacement sketchPlane)
+
+
 surface3dRotateAround : Axis3d -> Float -> Surface3d -> Surface3d
 surface3dRotateAround axis angle (Surface3d isRightHanded surface) =
     case surface of

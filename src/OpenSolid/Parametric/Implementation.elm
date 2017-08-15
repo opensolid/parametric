@@ -1786,3 +1786,41 @@ regionMirrorAcross axis region =
 
         Fused regions ->
             Fused (List.map (regionMirrorAcross axis) regions)
+
+
+body3dExtrusion : Region2d -> SketchPlane3d -> Float -> Body3d
+body3dExtrusion region sketchPlane distance =
+    let
+        planarSurface =
+            surface3dPlanar region sketchPlane
+
+        extrusionVector =
+            Vector3d.in_ (SketchPlane3d.normalDirection sketchPlane) distance
+
+        displacedSurface =
+            surface3dTranslateBy extrusionVector planarSurface
+
+        startSurface =
+            if distance >= 0.0 then
+                surface3dFlip planarSurface
+            else
+                planarSurface
+
+        endSurface =
+            if distance >= 0.0 then
+                displacedSurface
+            else
+                surface3dFlip displacedSurface
+
+        curves2d =
+            if distance >= 0.0 then
+                regionBoundaries region
+            else
+                regionBoundaries region |> List.map curve2dReverse
+
+        sideSurfaces =
+            curves2d
+                |> List.map (curve2dPlaceOnto sketchPlane)
+                |> List.map (\curve -> surface3dExtrusion curve extrusionVector)
+    in
+    Body3d (startSurface :: endSurface :: sideSurfaces)

@@ -1824,3 +1824,8 @@ body3dExtrusion region sketchPlane distance =
                 |> List.map (\curve -> surface3dExtrusion curve extrusionVector)
     in
     Body3d (startSurface :: endSurface :: sideSurfaces)
+
+
+body3dSurfaces : Body3d -> List Surface3d
+body3dSurfaces (Body3d surfaces) =
+    surfaces

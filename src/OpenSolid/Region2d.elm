@@ -12,15 +12,19 @@ module OpenSolid.Region2d
         , revolution
         , revolutionWith
         , rotateAround
+        , roundedRectangle
         , toMesh
         , translateBy
         )
 
 import OpenSolid.BoundaryType as BoundaryType
+import OpenSolid.Curve2d as Curve2d
+import OpenSolid.Frame2d as Frame2d
 import OpenSolid.Geometry.Types exposing (..)
 import OpenSolid.Mesh exposing (Mesh)
 import OpenSolid.Parametric.Implementation as Implementation
 import OpenSolid.Parametric.Types exposing (..)
+import OpenSolid.Point2d as Point2d
 import OpenSolid.Rectangle2d as Rectangle2d
 
 
@@ -107,3 +111,117 @@ mirrorAcross =
 fuse : List Region2d -> Region2d
 fuse =
     Implementation.Fused
+
+
+roundedRectangle : Rectangle2d -> Float -> Region2d
+roundedRectangle rectangle cornerRadius =
+    let
+        ( width, height ) =
+            Rectangle2d.dimensions rectangle
+
+        halfWidth =
+            width / 2
+
+        halfHeight =
+            height / 2
+
+        frame =
+            Rectangle2d.axes rectangle
+
+        xAxis =
+            Frame2d.xAxis frame
+
+        yAxis =
+            Frame2d.yAxis frame
+
+        cornerCenter =
+            Point2d.in_ frame
+                ( halfWidth - cornerRadius
+                , halfHeight - cornerRadius
+                )
+
+        cornerStart =
+            Point2d.in_ frame ( halfWidth, halfHeight - cornerRadius )
+
+        topRightCorner =
+            revolutionWith
+                { start = BoundaryType.interior
+                , end = BoundaryType.interior
+                , inside = BoundaryType.interior
+                , outside = BoundaryType.exterior
+                }
+                (Curve2d.lineSegment ( cornerCenter, cornerStart ))
+                cornerCenter
+                (degrees 90)
+
+        rightRectangle =
+            fromRectangleWith
+                { left = BoundaryType.interior
+                , right = BoundaryType.exterior
+                , top = BoundaryType.interior
+                , bottom = BoundaryType.interior
+                }
+                (Rectangle2d.in_ frame
+                    { minX = halfWidth - cornerRadius
+                    , maxX = halfWidth
+                    , minY = -halfHeight + cornerRadius
+                    , maxY = halfHeight - cornerRadius
+                    }
+                )
+
+        topRectangle =
+            fromRectangleWith
+                { left = BoundaryType.interior
+                , right = BoundaryType.interior
+                , top = BoundaryType.exterior
+                , bottom = BoundaryType.interior
+                }
+                (Rectangle2d.in_ frame
+                    { minX = -halfWidth + cornerRadius
+                    , maxX = halfWidth - cornerRadius
+                    , minY = halfHeight - cornerRadius
+                    , maxY = halfHeight
+                    }
+                )
+
+        leftRectangle =
+            rightRectangle |> mirrorAcross yAxis
+
+        bottomRectangle =
+            topRectangle |> mirrorAcross xAxis
+
+        topLeftCorner =
+            topRightCorner |> mirrorAcross yAxis
+
+        bottomRightCorner =
+            topRightCorner |> mirrorAcross xAxis
+
+        bottomLeftCorner =
+            topLeftCorner |> mirrorAcross xAxis
+
+        innerRectangle =
+            fromRectangleWith
+                { left = BoundaryType.interior
+                , right = BoundaryType.interior
+                , top = BoundaryType.interior
+                , bottom = BoundaryType.interior
+                }
+                (Rectangle2d.in_ frame
+                    { minX = -halfWidth + cornerRadius
+                    , maxX = halfWidth - cornerRadius
+                    , minY = -halfHeight + cornerRadius
+                    , maxY = halfHeight - cornerRadius
+                    }
+                )
+    in
+    fuse
+        [ topLeftCorner
+        , topRectangle
+        , topRightCorner
+        , leftRectangle
+        , innerRectangle
+        , rightRectangle
+        , bottomLeftCorner
+        , bottomRectangle
+        , bottomRightCorner
+        ]

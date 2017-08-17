@@ -1692,7 +1692,7 @@ regionToMesh tolerance region =
             Mesh.fromList (point :: curveVertices) faceIndices
 
         Fused regions ->
-            Mesh.merge (List.map (regionToMesh tolerance) regions)
+            Mesh.combine (List.map (regionToMesh tolerance) regions)
 
 
 regionTranslateBy : Vector2d -> Region2d -> Region2d

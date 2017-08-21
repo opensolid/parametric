@@ -5,9 +5,9 @@ module OpenSolid.Body3d
         , surfaces
         )
 
-import OpenSolid.Geometry.Types exposing (..)
 import OpenSolid.Parametric.Implementation as Implementation
 import OpenSolid.Parametric.Types exposing (..)
+import OpenSolid.SketchPlane3d as SketchPlane3d exposing (SketchPlane3d)
 
 
 extrusion : Region2d -> SketchPlane3d -> Float -> Body3d

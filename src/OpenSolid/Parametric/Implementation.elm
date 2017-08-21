@@ -1,28 +1,28 @@
 module OpenSolid.Parametric.Implementation exposing (..)
 
-import OpenSolid.Arc2d as Arc2d
-import OpenSolid.Arc3d as Arc3d
-import OpenSolid.Axis3d as Axis3d
-import OpenSolid.Circle2d as Circle2d
-import OpenSolid.CubicSpline2d as CubicSpline2d
-import OpenSolid.CubicSpline3d as CubicSpline3d
-import OpenSolid.Direction3d as Direction3d
-import OpenSolid.Frame2d as Frame2d
-import OpenSolid.Frame3d as Frame3d
-import OpenSolid.Geometry.Types exposing (..)
-import OpenSolid.LineSegment2d as LineSegment2d
-import OpenSolid.LineSegment3d as LineSegment3d
+import OpenSolid.Arc2d as Arc2d exposing (Arc2d)
+import OpenSolid.Arc3d as Arc3d exposing (Arc3d)
+import OpenSolid.Axis2d as Axis2d exposing (Axis2d)
+import OpenSolid.Axis3d as Axis3d exposing (Axis3d)
+import OpenSolid.CubicSpline2d as CubicSpline2d exposing (CubicSpline2d)
+import OpenSolid.CubicSpline3d as CubicSpline3d exposing (CubicSpline3d)
+import OpenSolid.Direction3d as Direction3d exposing (Direction3d)
+import OpenSolid.Frame2d as Frame2d exposing (Frame2d)
+import OpenSolid.Frame3d as Frame3d exposing (Frame3d)
+import OpenSolid.LineSegment2d as LineSegment2d exposing (LineSegment2d)
+import OpenSolid.LineSegment3d as LineSegment3d exposing (LineSegment3d)
 import OpenSolid.Mesh as Mesh exposing (Mesh)
-import OpenSolid.Plane3d as Plane3d
-import OpenSolid.Point2d as Point2d
-import OpenSolid.Point3d as Point3d
-import OpenSolid.Polyline2d as Polyline2d
-import OpenSolid.QuadraticSpline2d as QuadraticSpline2d
-import OpenSolid.QuadraticSpline3d as QuadraticSpline3d
-import OpenSolid.Rectangle2d as Rectangle2d
-import OpenSolid.SketchPlane3d as SketchPlane3d
-import OpenSolid.Vector2d as Vector2d
-import OpenSolid.Vector3d as Vector3d
+import OpenSolid.Plane3d as Plane3d exposing (Plane3d)
+import OpenSolid.Point2d as Point2d exposing (Point2d)
+import OpenSolid.Point3d as Point3d exposing (Point3d)
+import OpenSolid.Polyline2d as Polyline2d exposing (Polyline2d)
+import OpenSolid.Polyline3d as Polyline3d exposing (Polyline3d)
+import OpenSolid.QuadraticSpline2d as QuadraticSpline2d exposing (QuadraticSpline2d)
+import OpenSolid.QuadraticSpline3d as QuadraticSpline3d exposing (QuadraticSpline3d)
+import OpenSolid.Rectangle2d as Rectangle2d exposing (Rectangle2d)
+import OpenSolid.SketchPlane3d as SketchPlane3d exposing (SketchPlane3d)
+import OpenSolid.Vector2d as Vector2d exposing (Vector2d)
+import OpenSolid.Vector3d as Vector3d exposing (Vector3d)
 
 
 type Curve2d
@@ -298,7 +298,7 @@ curve2dRotateAround point angle curve2d =
         ProjectedCurve2d curve3d projectionSketchPlane ->
             let
                 rotationAxis =
-                    Axis3d
+                    Axis3d.with
                         { originPoint =
                             Point2d.placeOnto projectionSketchPlane point
                         , direction =
@@ -424,7 +424,7 @@ curve2dToPolyline tolerance curve2d =
         points =
             parameterValues |> List.map (curve2dPointOn curve2d)
     in
-    Polyline2d points
+    Polyline2d.withVertices points
 
 
 curve2dSamples : Float -> Curve2d -> List ( Point2d, Vector2d )
@@ -771,7 +771,7 @@ curve3dToPolyline tolerance curve3d =
         points =
             parameterValues |> List.map (curve3dPointOn curve3d)
     in
-    Polyline3d points
+    Polyline3d.withVertices points
 
 
 curve3dSamples : Float -> Curve3d -> List ( Point3d, Vector3d )
@@ -811,7 +811,7 @@ surface3dRevolution curve axis angle =
             Direction3d.perpendicularBasis zDirection
 
         frame =
-            Frame3d
+            Frame3d.with
                 { originPoint = Axis3d.originPoint axis
                 , xDirection = xDirection
                 , yDirection = yDirection
@@ -846,8 +846,12 @@ surface3dPointOn (Surface3d _ surface) =
                 ( xv, yv, zv ) =
                     Vector3d.components vVector
             in
-            \(Point2d ( u, v )) ->
-                Point3d
+            \point ->
+                let
+                    ( u, v ) =
+                        Point2d.coordinates point
+                in
+                Point3d.withCoordinates
                     ( x0 + u * xu + v * xv
                     , y0 + u * yu + v * yv
                     , z0 + u * zu + v * zv
@@ -858,7 +862,11 @@ surface3dPointOn (Surface3d _ surface) =
                 pointOnCurve =
                     curve3dPointOn curve
             in
-            \(Point2d ( u, v )) ->
+            \point ->
+                let
+                    ( u, v ) =
+                        Point2d.coordinates point
+                in
                 pointOnCurve u
                     |> Point3d.translateBy (Vector3d.scaleBy v vector)
 
@@ -867,8 +875,11 @@ surface3dPointOn (Surface3d _ surface) =
                 pointOnCurve =
                     curve3dPointOn localCurve
             in
-            \(Point2d ( u, v )) ->
+            \point ->
                 let
+                    ( u, v ) =
+                        Point2d.coordinates point
+
                     ( x0, y0, z ) =
                         Point3d.coordinates (pointOnCurve v)
 
@@ -1038,7 +1049,11 @@ surface3dToMesh tolerance (Surface3d isRightHanded surface3d) =
                             Point3d.coordinates point
 
                         uDerivative =
-                            Vector3d ( sweptAngle * x, sweptAngle * y, 0 )
+                            Vector3d.withComponents
+                                ( sweptAngle * x
+                                , sweptAngle * y
+                                , 0
+                                )
 
                         normalVector =
                             Vector3d.normalize <|
@@ -1072,12 +1087,12 @@ surface3dToMesh tolerance (Surface3d isRightHanded surface3d) =
                             ( nx, ny, nz ) =
                                 Vector3d.components normalVector
                         in
-                        ( Point3d
+                        ( Point3d.withCoordinates
                             ( x * cosAngle - y * sinAngle
                             , y * cosAngle + x * sinAngle
                             , z
                             )
-                        , Vector3d
+                        , Vector3d.withComponents
                             ( nx * cosAngle - ny * sinAngle
                             , ny * cosAngle + nx * sinAngle
                             , nz
@@ -1305,7 +1320,10 @@ regionBoundaries region =
                         Exterior ->
                             Just <|
                                 LineSegment2dCurve <|
-                                    LineSegment2d ( startPoint, endPoint )
+                                    LineSegment2d.withEndpoints
+                                        ( startPoint
+                                        , endPoint
+                                        )
 
                         Interior ->
                             Nothing
@@ -1358,7 +1376,7 @@ regionBoundaries region =
                         Exterior ->
                             let
                                 lineSegment =
-                                    LineSegment2d
+                                    LineSegment2d.withEndpoints
                                         ( startPoint
                                         , Point2d.translateBy
                                             extrusionVector
@@ -1375,7 +1393,7 @@ regionBoundaries region =
                         Exterior ->
                             let
                                 lineSegment =
-                                    LineSegment2d
+                                    LineSegment2d.withEndpoints
                                         ( Point2d.translateBy
                                             extrusionVector
                                             endPoint
@@ -1436,7 +1454,7 @@ regionBoundaries region =
                         Exterior ->
                             let
                                 arc =
-                                    Arc2d
+                                    Arc2d.with
                                         { startPoint = outsidePoint
                                         , centerPoint = centerPoint
                                         , sweptAngle = sweptAngle
@@ -1455,7 +1473,7 @@ regionBoundaries region =
                         Exterior ->
                             let
                                 arc =
-                                    Arc2d
+                                    Arc2d.with
                                         { startPoint = insidePoint
                                         , centerPoint = centerPoint
                                         , sweptAngle = sweptAngle
@@ -1483,7 +1501,7 @@ regionBoundaries region =
                         Exterior ->
                             let
                                 lineSegment =
-                                    LineSegment2d
+                                    LineSegment2d.withEndpoints
                                         ( point, curve2dStartPoint curve2d )
                             in
                             Just (LineSegment2dCurve lineSegment)
@@ -1496,7 +1514,7 @@ regionBoundaries region =
                         Exterior ->
                             let
                                 lineSegment =
-                                    LineSegment2d
+                                    LineSegment2d.withEndpoints
                                         ( curve2dEndPoint curve2d, point )
                             in
                             Just (LineSegment2dCurve lineSegment)

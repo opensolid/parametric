@@ -17,15 +17,16 @@ module OpenSolid.Region2d
         , translateBy
         )
 
+import OpenSolid.Axis2d as Axis2d exposing (Axis2d)
 import OpenSolid.BoundaryType as BoundaryType
 import OpenSolid.Curve2d as Curve2d
-import OpenSolid.Frame2d as Frame2d
-import OpenSolid.Geometry.Types exposing (..)
+import OpenSolid.Frame2d as Frame2d exposing (Frame2d)
 import OpenSolid.Mesh exposing (Mesh)
 import OpenSolid.Parametric.Implementation as Implementation
 import OpenSolid.Parametric.Types exposing (..)
-import OpenSolid.Point2d as Point2d
-import OpenSolid.Rectangle2d as Rectangle2d
+import OpenSolid.Point2d as Point2d exposing (Point2d)
+import OpenSolid.Rectangle2d as Rectangle2d exposing (Rectangle2d)
+import OpenSolid.Vector2d as Vector2d exposing (Vector2d)
 
 
 rectangle : { minX : Float, maxX : Float, minY : Float, maxY : Float } -> Region2d

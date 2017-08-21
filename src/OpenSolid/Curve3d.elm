@@ -20,14 +20,23 @@ module OpenSolid.Curve3d
         , translateBy
         )
 
-import OpenSolid.Geometry.Types exposing (..)
+import OpenSolid.Arc3d as Arc3d exposing (Arc3d)
+import OpenSolid.Axis3d as Axis3d exposing (Axis3d)
+import OpenSolid.CubicSpline3d as CubicSpline3d exposing (CubicSpline3d)
+import OpenSolid.Frame3d as Frame3d exposing (Frame3d)
+import OpenSolid.LineSegment3d as LineSegment3d exposing (LineSegment3d)
 import OpenSolid.Parametric.Implementation as Implementation
 import OpenSolid.Parametric.Types exposing (..)
+import OpenSolid.Plane3d as Plane3d exposing (Plane3d)
+import OpenSolid.Point3d as Point3d exposing (Point3d)
+import OpenSolid.Polyline3d as Polyline3d exposing (Polyline3d)
+import OpenSolid.QuadraticSpline3d as QuadraticSpline3d exposing (QuadraticSpline3d)
+import OpenSolid.Vector3d as Vector3d exposing (Vector3d)
 
 
 lineSegment : ( Point3d, Point3d ) -> Curve3d
 lineSegment =
-    fromLineSegment << LineSegment3d
+    fromLineSegment << LineSegment3d.withEndpoints
 
 
 fromLineSegment : LineSegment3d -> Curve3d
@@ -37,7 +46,7 @@ fromLineSegment =
 
 arc : { startPoint : Point3d, axis : Axis3d, sweptAngle : Float } -> Curve3d
 arc =
-    fromArc << Arc3d
+    fromArc << Arc3d.with
 
 
 fromArc : Arc3d -> Curve3d
@@ -47,7 +56,7 @@ fromArc =
 
 cubicSpline : ( Point3d, Point3d, Point3d, Point3d ) -> Curve3d
 cubicSpline =
-    fromCubicSpline << CubicSpline3d
+    fromCubicSpline << CubicSpline3d.withControlPoints
 
 
 fromCubicSpline : CubicSpline3d -> Curve3d
@@ -57,7 +66,7 @@ fromCubicSpline =
 
 quadraticSpline : ( Point3d, Point3d, Point3d ) -> Curve3d
 quadraticSpline =
-    fromQuadraticSpline << QuadraticSpline3d
+    fromQuadraticSpline << QuadraticSpline3d.withControlPoints
 
 
 fromQuadraticSpline : QuadraticSpline3d -> Curve3d

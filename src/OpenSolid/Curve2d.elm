@@ -30,9 +30,18 @@ module OpenSolid.Curve2d
         , translateBy
         )
 
-import OpenSolid.Geometry.Types exposing (..)
+import OpenSolid.Arc2d as Arc2d exposing (Arc2d)
+import OpenSolid.Axis2d as Axis2d exposing (Axis2d)
+import OpenSolid.CubicSpline2d as CubicSpline2d exposing (CubicSpline2d)
+import OpenSolid.Frame2d as Frame2d exposing (Frame2d)
+import OpenSolid.LineSegment2d as LineSegment2d exposing (LineSegment2d)
 import OpenSolid.Parametric.Implementation as Implementation
 import OpenSolid.Parametric.Types exposing (..)
+import OpenSolid.Point2d as Point2d exposing (Point2d)
+import OpenSolid.Polyline2d as Polyline2d exposing (Polyline2d)
+import OpenSolid.QuadraticSpline2d as QuadraticSpline2d exposing (QuadraticSpline2d)
+import OpenSolid.SketchPlane3d as SketchPlane3d exposing (SketchPlane3d)
+import OpenSolid.Vector2d as Vector2d exposing (Vector2d)
 
 
 fromLineSegment : LineSegment2d -> Curve2d
@@ -42,7 +51,7 @@ fromLineSegment =
 
 lineSegment : ( Point2d, Point2d ) -> Curve2d
 lineSegment =
-    fromLineSegment << LineSegment2d
+    fromLineSegment << LineSegment2d.withEndpoints
 
 
 fromArc : Arc2d -> Curve2d
@@ -52,7 +61,7 @@ fromArc =
 
 arc : { startPoint : Point2d, centerPoint : Point2d, sweptAngle : Float } -> Curve2d
 arc =
-    fromArc << Arc2d
+    fromArc << Arc2d.with
 
 
 fromCubicSpline : CubicSpline2d -> Curve2d
@@ -62,7 +71,7 @@ fromCubicSpline =
 
 cubicSpline : ( Point2d, Point2d, Point2d, Point2d ) -> Curve2d
 cubicSpline =
-    fromCubicSpline << CubicSpline2d
+    fromCubicSpline << CubicSpline2d.withControlPoints
 
 
 fromQuadraticSpline : QuadraticSpline2d -> Curve2d
@@ -72,7 +81,7 @@ fromQuadraticSpline =
 
 quadraticSpline : ( Point2d, Point2d, Point2d ) -> Curve2d
 quadraticSpline =
-    fromQuadraticSpline << QuadraticSpline2d
+    fromQuadraticSpline << QuadraticSpline2d.withControlPoints
 
 
 pointOn : Curve2d -> Float -> Point2d

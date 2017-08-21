@@ -9,10 +9,14 @@ module OpenSolid.Surface3d
         , translateBy
         )
 
-import OpenSolid.Geometry.Types exposing (..)
+import OpenSolid.Axis3d as Axis3d exposing (Axis3d)
 import OpenSolid.Mesh exposing (Mesh)
 import OpenSolid.Parametric.Implementation as Implementation
 import OpenSolid.Parametric.Types exposing (..)
+import OpenSolid.Point2d as Point2d exposing (Point2d)
+import OpenSolid.Point3d as Point3d exposing (Point3d)
+import OpenSolid.SketchPlane3d as SketchPlane3d exposing (SketchPlane3d)
+import OpenSolid.Vector3d as Vector3d exposing (Vector3d)
 
 
 pointOn : Surface3d -> Point2d -> Point3d

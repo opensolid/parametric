@@ -3,10 +3,6 @@ module OpenSolid.Curve3d
         ( arc
         , cubicSpline
         , endPoint
-        , fromArc
-        , fromCubicSpline
-        , fromLineSegment
-        , fromQuadraticSpline
         , lineSegment
         , placeIn
         , pointOn
@@ -34,43 +30,23 @@ import OpenSolid.QuadraticSpline3d as QuadraticSpline3d exposing (QuadraticSplin
 import OpenSolid.Vector3d as Vector3d exposing (Vector3d)
 
 
-lineSegment : ( Point3d, Point3d ) -> Curve3d
+lineSegment : LineSegment3d -> Curve3d
 lineSegment =
-    fromLineSegment << LineSegment3d.withEndpoints
-
-
-fromLineSegment : LineSegment3d -> Curve3d
-fromLineSegment =
     Implementation.LineSegment3dCurve
 
 
-arc : { startPoint : Point3d, axis : Axis3d, sweptAngle : Float } -> Curve3d
+arc : Arc3d -> Curve3d
 arc =
-    fromArc << Arc3d.with
-
-
-fromArc : Arc3d -> Curve3d
-fromArc =
     Implementation.Arc3dCurve
 
 
-cubicSpline : ( Point3d, Point3d, Point3d, Point3d ) -> Curve3d
+cubicSpline : CubicSpline3d -> Curve3d
 cubicSpline =
-    fromCubicSpline << CubicSpline3d.withControlPoints
-
-
-fromCubicSpline : CubicSpline3d -> Curve3d
-fromCubicSpline =
     Implementation.CubicSpline3dCurve
 
 
-quadraticSpline : ( Point3d, Point3d, Point3d ) -> Curve3d
+quadraticSpline : QuadraticSpline3d -> Curve3d
 quadraticSpline =
-    fromQuadraticSpline << QuadraticSpline3d.withControlPoints
-
-
-fromQuadraticSpline : QuadraticSpline3d -> Curve3d
-fromQuadraticSpline =
     Implementation.QuadraticSpline3dCurve
 
 

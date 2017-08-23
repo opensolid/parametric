@@ -21,6 +21,7 @@ import OpenSolid.Axis2d as Axis2d exposing (Axis2d)
 import OpenSolid.BoundaryType as BoundaryType
 import OpenSolid.Curve2d as Curve2d
 import OpenSolid.Frame2d as Frame2d exposing (Frame2d)
+import OpenSolid.LineSegment2d as LineSegment2d exposing (LineSegment2d)
 import OpenSolid.Mesh exposing (Mesh)
 import OpenSolid.Parametric.Implementation as Implementation
 import OpenSolid.Parametric.Types exposing (..)
@@ -151,7 +152,9 @@ roundedRectangle rectangle cornerRadius =
                 , inside = BoundaryType.interior
                 , outside = BoundaryType.exterior
                 }
-                (Curve2d.lineSegment ( cornerCenter, cornerStart ))
+                (Curve2d.lineSegment <|
+                    LineSegment2d.withEndpoints ( cornerCenter, cornerStart )
+                )
                 cornerCenter
                 (degrees 90)
 

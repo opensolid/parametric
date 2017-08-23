@@ -7,10 +7,6 @@ module OpenSolid.Curve2d
         , elseIf
         , else_
         , endPoint
-        , fromArc
-        , fromCubicSpline
-        , fromLineSegment
-        , fromQuadraticSpline
         , if_
         , isArc
         , isCubicSpline
@@ -44,44 +40,24 @@ import OpenSolid.SketchPlane3d as SketchPlane3d exposing (SketchPlane3d)
 import OpenSolid.Vector2d as Vector2d exposing (Vector2d)
 
 
-fromLineSegment : LineSegment2d -> Curve2d
-fromLineSegment =
+lineSegment : LineSegment2d -> Curve2d
+lineSegment =
     Implementation.LineSegment2dCurve
 
 
-lineSegment : ( Point2d, Point2d ) -> Curve2d
-lineSegment =
-    fromLineSegment << LineSegment2d.withEndpoints
-
-
-fromArc : Arc2d -> Curve2d
-fromArc =
+arc : Arc2d -> Curve2d
+arc =
     Implementation.Arc2dCurve
 
 
-arc : { startPoint : Point2d, centerPoint : Point2d, sweptAngle : Float } -> Curve2d
-arc =
-    fromArc << Arc2d.with
-
-
-fromCubicSpline : CubicSpline2d -> Curve2d
-fromCubicSpline =
+cubicSpline : CubicSpline2d -> Curve2d
+cubicSpline =
     Implementation.CubicSpline2dCurve
 
 
-cubicSpline : ( Point2d, Point2d, Point2d, Point2d ) -> Curve2d
-cubicSpline =
-    fromCubicSpline << CubicSpline2d.withControlPoints
-
-
-fromQuadraticSpline : QuadraticSpline2d -> Curve2d
-fromQuadraticSpline =
-    Implementation.QuadraticSpline2dCurve
-
-
-quadraticSpline : ( Point2d, Point2d, Point2d ) -> Curve2d
+quadraticSpline : QuadraticSpline2d -> Curve2d
 quadraticSpline =
-    fromQuadraticSpline << QuadraticSpline2d.withControlPoints
+    Implementation.QuadraticSpline2dCurve
 
 
 pointOn : Curve2d -> Float -> Point2d

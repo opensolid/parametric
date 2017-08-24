@@ -153,7 +153,7 @@ roundedRectangle rectangle cornerRadius =
                 , outside = BoundaryType.exterior
                 }
                 (Curve2d.lineSegment <|
-                    LineSegment2d.withEndpoints ( cornerCenter, cornerStart )
+                    LineSegment2d.from cornerCenter cornerStart
                 )
                 cornerCenter
                 (degrees 90)

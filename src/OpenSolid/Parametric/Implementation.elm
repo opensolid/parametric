@@ -1320,10 +1320,7 @@ regionBoundaries region =
                         Exterior ->
                             Just <|
                                 LineSegment2dCurve <|
-                                    LineSegment2d.withEndpoints
-                                        ( startPoint
-                                        , endPoint
-                                        )
+                                    LineSegment2d.from startPoint endPoint
 
                         Interior ->
                             Nothing

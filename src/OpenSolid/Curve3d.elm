@@ -4,6 +4,7 @@ module OpenSolid.Curve3d
         , cubicSpline
         , endPoint
         , lineSegment
+        , on
         , placeIn
         , pointOn
         , projectOnto
@@ -27,6 +28,7 @@ import OpenSolid.Plane3d as Plane3d exposing (Plane3d)
 import OpenSolid.Point3d as Point3d exposing (Point3d)
 import OpenSolid.Polyline3d as Polyline3d exposing (Polyline3d)
 import OpenSolid.QuadraticSpline3d as QuadraticSpline3d exposing (QuadraticSpline3d)
+import OpenSolid.SketchPlane3d as SketchPlane3d exposing (SketchPlane3d)
 import OpenSolid.Vector3d as Vector3d exposing (Vector3d)
 
 
@@ -48,6 +50,11 @@ cubicSpline =
 quadraticSpline : QuadraticSpline3d -> Curve3d
 quadraticSpline =
     Implementation.QuadraticSpline3dCurve
+
+
+on : SketchPlane3d -> Curve2d -> Curve3d
+on =
+    Implementation.curve3dOn
 
 
 pointOn : Curve3d -> Float -> Point3d

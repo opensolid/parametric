@@ -218,32 +218,6 @@ curve2dRelativeTo frame curve2d =
             ProjectedCurve2d curve3d (Frame2d.placeOnto sketchPlane frame)
 
 
-curve2dPlaceOnto : SketchPlane3d -> Curve2d -> Curve3d
-curve2dPlaceOnto sketchPlane curve2d =
-    case curve2d of
-        LineSegment2dCurve lineSegment2d ->
-            LineSegment3dCurve
-                (LineSegment2d.placeOnto sketchPlane lineSegment2d)
-
-        Arc2dCurve arc2d ->
-            Arc3dCurve
-                (Arc2d.placeOnto sketchPlane arc2d)
-
-        QuadraticSpline2dCurve quadraticSpline2d ->
-            QuadraticSpline3dCurve
-                (QuadraticSpline2d.placeOnto sketchPlane quadraticSpline2d)
-
-        CubicSpline2dCurve cubicSpline2d ->
-            CubicSpline3dCurve
-                (CubicSpline2d.placeOnto sketchPlane cubicSpline2d)
-
-        ProjectedCurve2d curve3d projectionSketchPlane ->
-            if sketchPlane == projectionSketchPlane then
-                curve3d
-            else
-                PlacedCurve3d curve2d sketchPlane
-
-
 curve2dTranslateBy : Vector2d -> Curve2d -> Curve2d
 curve2dTranslateBy displacement curve2d =
     case curve2d of
@@ -267,7 +241,7 @@ curve2dTranslateBy displacement curve2d =
             let
                 sketchPlaneDisplacement =
                     Vector2d.flip displacement
-                        |> Vector2d.placeOnto projectionSketchPlane
+                        |> Vector3d.on projectionSketchPlane
 
                 translatedSketchPlane =
                     projectionSketchPlane
@@ -300,7 +274,7 @@ curve2dRotateAround point angle curve2d =
                 rotationAxis =
                     Axis3d.with
                         { originPoint =
-                            Point2d.placeOnto projectionSketchPlane point
+                            Point3d.on projectionSketchPlane point
                         , direction =
                             SketchPlane3d.normalDirection projectionSketchPlane
                         }
@@ -439,6 +413,32 @@ curve2dSamples tolerance curve2d =
     parameterValues |> List.map (curve2dEvaluate curve2d)
 
 
+curve3dOn : SketchPlane3d -> Curve2d -> Curve3d
+curve3dOn sketchPlane curve2d =
+    case curve2d of
+        LineSegment2dCurve lineSegment2d ->
+            LineSegment3dCurve
+                (LineSegment3d.on sketchPlane lineSegment2d)
+
+        Arc2dCurve arc2d ->
+            Arc3dCurve
+                (Arc3d.on sketchPlane arc2d)
+
+        QuadraticSpline2dCurve quadraticSpline2d ->
+            QuadraticSpline3dCurve
+                (QuadraticSpline3d.on sketchPlane quadraticSpline2d)
+
+        CubicSpline2dCurve cubicSpline2d ->
+            CubicSpline3dCurve
+                (CubicSpline3d.on sketchPlane cubicSpline2d)
+
+        ProjectedCurve2d curve3d projectionSketchPlane ->
+            if sketchPlane == projectionSketchPlane then
+                curve3d
+            else
+                PlacedCurve3d curve2d sketchPlane
+
+
 curve3dStartPoint : Curve3d -> Point3d
 curve3dStartPoint curve3d =
     case curve3d of
@@ -455,7 +455,7 @@ curve3dStartPoint curve3d =
             CubicSpline3d.startPoint cubicSpline3d
 
         PlacedCurve3d curve2d sketchPlane ->
-            curve2dStartPoint curve2d |> Point2d.placeOnto sketchPlane
+            curve2dStartPoint curve2d |> Point3d.on sketchPlane
 
         ProjectedCurve3d unprojectedCurve3d plane ->
             curve3dStartPoint unprojectedCurve3d |> Point3d.projectOnto plane
@@ -477,7 +477,7 @@ curve3dEndPoint curve3d =
             CubicSpline3d.endPoint cubicSpline3d
 
         PlacedCurve3d curve2d sketchPlane ->
-            curve2dEndPoint curve2d |> Point2d.placeOnto sketchPlane
+            curve2dEndPoint curve2d |> Point3d.on sketchPlane
 
         ProjectedCurve3d unprojectedCurve3d plane ->
             curve3dEndPoint unprojectedCurve3d |> Point3d.projectOnto plane
@@ -499,7 +499,7 @@ curve3dPointOn curve3d =
             CubicSpline3d.pointOn cubicSpline3d
 
         PlacedCurve3d curve2d sketchPlane ->
-            curve2dPointOn curve2d >> Point2d.placeOnto sketchPlane
+            curve2dPointOn curve2d >> Point3d.on sketchPlane
 
         ProjectedCurve3d unprojectedCurve3d plane ->
             curve3dPointOn unprojectedCurve3d >> Point3d.projectOnto plane
@@ -527,8 +527,8 @@ curve3dEvaluate curve3d =
         PlacedCurve3d curve2d sketchPlane ->
             curve2dEvaluate curve2d
                 >> (\( point2d, vector2d ) ->
-                        ( Point2d.placeOnto sketchPlane point2d
-                        , Vector2d.placeOnto sketchPlane vector2d
+                        ( Point3d.on sketchPlane point2d
+                        , Vector3d.on sketchPlane vector2d
                         )
                    )
 
@@ -902,7 +902,7 @@ surface3dPointOn (Surface3d _ surface) =
 
         PlanarSurface _ sketchPlane ->
             -- TODO: interpolate within region bounding box?
-            Point2d.placeOnto sketchPlane
+            Point3d.on sketchPlane
 
 
 surface3dToMesh : Float -> Surface3d -> Mesh ( Point3d, Vector3d )
@@ -1183,7 +1183,7 @@ surface3dToMesh tolerance (Surface3d isRightHanded surface3d) =
                         Vector3d.flip planeNormalVector
 
                 toVertex3d point =
-                    ( Point2d.placeOnto sketchPlane point
+                    ( Point3d.on sketchPlane point
                     , normalVector
                     )
             in
@@ -1836,7 +1836,7 @@ body3dExtrusion region sketchPlane distance =
 
         sideSurfaces =
             curves2d
-                |> List.map (curve2dPlaceOnto sketchPlane)
+                |> List.map (curve3dOn sketchPlane)
                 |> List.map (\curve -> surface3dExtrusion curve extrusionVector)
     in
     Body3d (startSurface :: endSurface :: sideSurfaces)

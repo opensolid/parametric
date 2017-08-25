@@ -13,7 +13,6 @@ module OpenSolid.Curve2d
         , mirrorAcross
         , otherwise
         , placeIn
-        , placeOnto
         , pointOn
         , quadraticSpline
         , relativeTo
@@ -34,7 +33,6 @@ import OpenSolid.Parametric.Types exposing (..)
 import OpenSolid.Point2d as Point2d exposing (Point2d)
 import OpenSolid.Polyline2d as Polyline2d exposing (Polyline2d)
 import OpenSolid.QuadraticSpline2d as QuadraticSpline2d exposing (QuadraticSpline2d)
-import OpenSolid.SketchPlane3d as SketchPlane3d exposing (SketchPlane3d)
 import OpenSolid.Vector2d as Vector2d exposing (Vector2d)
 
 
@@ -61,11 +59,6 @@ quadraticSpline =
 pointOn : Curve2d -> Float -> Point2d
 pointOn =
     Implementation.curve2dPointOn
-
-
-placeOnto : SketchPlane3d -> Curve2d -> Curve3d
-placeOnto =
-    Implementation.curve2dPlaceOnto
 
 
 relativeTo : Frame2d -> Curve2d -> Curve2d

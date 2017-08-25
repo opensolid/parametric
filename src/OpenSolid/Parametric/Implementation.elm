@@ -811,7 +811,7 @@ surface3dRevolution curve axis angle =
             Direction3d.perpendicularBasis zDirection
 
         frame =
-            Frame3d.with
+            Frame3d.unsafe
                 { originPoint = Axis3d.originPoint axis
                 , xDirection = xDirection
                 , yDirection = yDirection

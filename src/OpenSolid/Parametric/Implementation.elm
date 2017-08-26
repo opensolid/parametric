@@ -804,18 +804,10 @@ surface3dExtrusion curve vector =
 surface3dRevolution : Curve3d -> Axis3d -> Float -> Surface3d
 surface3dRevolution curve axis angle =
     let
-        zDirection =
-            Axis3d.direction axis
-
-        ( xDirection, yDirection ) =
-            Direction3d.perpendicularBasis zDirection
-
         frame =
-            Frame3d.unsafe
+            Frame3d.with
                 { originPoint = Axis3d.originPoint axis
-                , xDirection = xDirection
-                , yDirection = yDirection
-                , zDirection = zDirection
+                , zDirection = Axis3d.direction axis
                 }
     in
     Surface3d True

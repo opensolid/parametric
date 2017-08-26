@@ -194,7 +194,7 @@ curve2dPlaceIn frame curve2d =
             ProjectedCurve2d curve3d
                 (Frame2d.xy
                     |> Frame2d.relativeTo frame
-                    |> Frame2d.placeOnto sketchPlane
+                    |> SketchPlane3d.on sketchPlane
                 )
 
 
@@ -215,7 +215,7 @@ curve2dRelativeTo frame curve2d =
             CubicSpline2dCurve (CubicSpline2d.relativeTo frame cubicSpline2d)
 
         ProjectedCurve2d curve3d sketchPlane ->
-            ProjectedCurve2d curve3d (Frame2d.placeOnto sketchPlane frame)
+            ProjectedCurve2d curve3d (SketchPlane3d.on sketchPlane frame)
 
 
 curve2dTranslateBy : Vector2d -> Curve2d -> Curve2d
@@ -310,7 +310,7 @@ curve2dMirrorAcross axis curve2d =
                 mirroredSketchPlane =
                     Frame2d.xy
                         |> Frame2d.mirrorAcross axis
-                        |> Frame2d.placeOnto projectionSketchPlane
+                        |> SketchPlane3d.on projectionSketchPlane
             in
             ProjectedCurve2d curve3d mirroredSketchPlane
 

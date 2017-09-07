@@ -1856,3 +1856,13 @@ body3dExtrusion region sketchPlane distance =
 body3dSurfaces : Body3d -> List Surface3d
 body3dSurfaces (Body3d surfaces) =
     surfaces
+
+
+body3dTranslateBy : Vector3d -> Body3d -> Body3d
+body3dTranslateBy displacement (Body3d surfaces) =
+    Body3d (List.map (surface3dTranslateBy displacement) surfaces)
+
+
+body3dRotateAround : Axis3d -> Float -> Body3d -> Body3d
+body3dRotateAround axis angle (Body3d surfaces) =
+    Body3d (List.map (surface3dRotateAround axis angle) surfaces)

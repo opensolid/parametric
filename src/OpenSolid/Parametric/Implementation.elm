@@ -1042,8 +1042,8 @@ surface3dToMesh tolerance (Surface3d isRightHanded surface3d) =
 
                         uDerivative =
                             Vector3d.withComponents
-                                ( sweptAngle * x
-                                , sweptAngle * y
+                                ( -sweptAngle * y
+                                , sweptAngle * x
                                 , 0
                                 )
 
@@ -1051,12 +1051,12 @@ surface3dToMesh tolerance (Surface3d isRightHanded surface3d) =
                             Vector3d.normalize <|
                                 if isRightHanded then
                                     Vector3d.crossProduct
-                                        uDerivative
                                         vDerivative
+                                        uDerivative
                                 else
                                     Vector3d.crossProduct
-                                        vDerivative
                                         uDerivative
+                                        vDerivative
                     in
                     ( point, normalVector )
 

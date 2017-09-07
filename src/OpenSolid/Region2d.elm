@@ -4,6 +4,8 @@ module OpenSolid.Region2d
         , boundaries
         , extrusion
         , extrusionWith
+        , fan
+        , fanWith
         , fromRectangle
         , fromRectangleWith
         , fuse
@@ -25,7 +27,7 @@ import OpenSolid.Frame2d as Frame2d exposing (Frame2d)
 import OpenSolid.LineSegment2d as LineSegment2d exposing (LineSegment2d)
 import OpenSolid.Mesh exposing (Mesh)
 import OpenSolid.Parametric.Implementation as Implementation
-import OpenSolid.Parametric.Types exposing (..)
+import OpenSolid.Parametric.Types as Types exposing (..)
 import OpenSolid.Point2d as Point2d exposing (Point2d)
 import OpenSolid.Rectangle2d as Rectangle2d exposing (Rectangle2d)
 import OpenSolid.Vector2d as Vector2d exposing (Vector2d)
@@ -88,6 +90,20 @@ revolution =
 revolutionWith : { start : BoundaryType, end : BoundaryType, inside : BoundaryType, outside : BoundaryType } -> Curve2d -> Point2d -> Float -> Region2d
 revolutionWith =
     Implementation.regionRevolutionWith
+
+
+fan : Point2d -> Curve2d -> Region2d
+fan =
+    fanWith
+        { start = BoundaryType.exterior
+        , end = BoundaryType.exterior
+        , curve = BoundaryType.exterior
+        }
+
+
+fanWith : { start : BoundaryType, end : BoundaryType, curve : BoundaryType } -> Point2d -> Curve2d -> Region2d
+fanWith boundaryTypes point curve =
+    Implementation.FanRegion point curve boundaryTypes
 
 
 boundaries : Region2d -> List Curve2d

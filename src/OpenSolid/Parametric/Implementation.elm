@@ -1178,8 +1178,27 @@ surface3dToMesh tolerance (Surface3d isRightHanded surface3d) =
                     ( Point3d.on sketchPlane point
                     , normalVector
                     )
+
+                rightHandedMesh =
+                    regionToMesh tolerance region |> Mesh.map toVertex3d
             in
-            regionToMesh tolerance region |> Mesh.map toVertex3d
+            if isRightHanded then
+                rightHandedMesh
+            else
+                let
+                    vertices =
+                        Mesh.vertices rightHandedMesh
+
+                    rightHandedFaceIndices =
+                        Mesh.faceIndices rightHandedMesh
+
+                    flipFaceOrientation ( i, j, k ) =
+                        ( i, k, j )
+
+                    leftHandedFaceIndices =
+                        List.map flipFaceOrientation rightHandedFaceIndices
+                in
+                Mesh.fromArray vertices leftHandedFaceIndices
 
 
 surface3dTranslateBy : Vector3d -> Surface3d -> Surface3d

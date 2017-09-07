@@ -1,6 +1,7 @@
 module OpenSolid.Curve2d
     exposing
-        ( Matcher
+        ( Curve2d
+        , Matcher
         , arc
         , cubicSpline
         , endPoint
@@ -29,11 +30,15 @@ import OpenSolid.CubicSpline2d as CubicSpline2d exposing (CubicSpline2d)
 import OpenSolid.Frame2d as Frame2d exposing (Frame2d)
 import OpenSolid.LineSegment2d as LineSegment2d exposing (LineSegment2d)
 import OpenSolid.Parametric.Implementation as Implementation
-import OpenSolid.Parametric.Types exposing (..)
+import OpenSolid.Parametric.Types as Types exposing (..)
 import OpenSolid.Point2d as Point2d exposing (Point2d)
 import OpenSolid.Polyline2d as Polyline2d exposing (Polyline2d)
 import OpenSolid.QuadraticSpline2d as QuadraticSpline2d exposing (QuadraticSpline2d)
 import OpenSolid.Vector2d as Vector2d exposing (Vector2d)
+
+
+type alias Curve2d =
+    Types.Curve2d
 
 
 lineSegment : LineSegment2d -> Curve2d

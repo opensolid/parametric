@@ -1,6 +1,7 @@
 module OpenSolid.Region2d
     exposing
-        ( boundaries
+        ( Region2d
+        , boundaries
         , extrusion
         , extrusionWith
         , fromRectangle
@@ -28,6 +29,10 @@ import OpenSolid.Parametric.Types exposing (..)
 import OpenSolid.Point2d as Point2d exposing (Point2d)
 import OpenSolid.Rectangle2d as Rectangle2d exposing (Rectangle2d)
 import OpenSolid.Vector2d as Vector2d exposing (Vector2d)
+
+
+type alias Region2d =
+    Types.Region2d
 
 
 rectangle : { minX : Float, maxX : Float, minY : Float, maxY : Float } -> Region2d

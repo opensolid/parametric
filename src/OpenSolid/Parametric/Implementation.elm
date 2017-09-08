@@ -1,5 +1,6 @@
 module OpenSolid.Parametric.Implementation exposing (..)
 
+import Array.Hamt as Array
 import OpenSolid.Arc2d as Arc2d exposing (Arc2d)
 import OpenSolid.Arc3d as Arc3d exposing (Arc3d)
 import OpenSolid.Axis2d as Axis2d exposing (Axis2d)
@@ -920,17 +921,17 @@ surface3dToMesh tolerance (Surface3d isRightHanded surface3d) =
 
                 p3 =
                     p0 |> Point3d.translateBy vVector
-
-                vertices =
-                    [ ( p0, n ), ( p1, n ), ( p2, n ), ( p3, n ) ]
-
-                faceIndices =
+            in
+            Mesh.with
+                { vertices =
+                    Array.fromList
+                        [ ( p0, n ), ( p1, n ), ( p2, n ), ( p3, n ) ]
+                , faceIndices =
                     if isRightHanded then
                         [ ( 0, 1, 2 ), ( 0, 2, 3 ) ]
                     else
                         [ ( 0, 2, 1 ), ( 0, 3, 2 ) ]
-            in
-            Mesh.fromList vertices faceIndices
+                }
 
         ExtrusionSurface curve3d extrusionVector ->
             let
@@ -977,9 +978,6 @@ surface3dToMesh tolerance (Surface3d isRightHanded surface3d) =
                         _ ->
                             result
 
-                vertices =
-                    accumulate startVertices endVertices []
-
                 prependFaces columnIndex faces =
                     if columnIndex < numColumns then
                         let
@@ -1002,11 +1000,12 @@ surface3dToMesh tolerance (Surface3d isRightHanded surface3d) =
                             (faceIndices1 :: faceIndices2 :: faces)
                     else
                         faces
-
-                faceIndices =
-                    prependFaces 0 []
             in
-            Mesh.fromList vertices faceIndices
+            Mesh.with
+                { vertices =
+                    Array.fromList (accumulate startVertices endVertices [])
+                , faceIndices = prependFaces 0 []
+                }
 
         RevolutionSurface localCurve3d frame sweptAngle ->
             let
@@ -1156,11 +1155,19 @@ surface3dToMesh tolerance (Surface3d isRightHanded surface3d) =
                         prependFaces (rowIndex + 1) 0 faces
                     else
                         faces
-
-                faceIndices =
-                    prependFaces 0 0 []
             in
-            Mesh.fromList vertices faceIndices
+            Mesh.with
+                { vertices =
+                    List.concat (startVertices :: rotatedVertexLists)
+                        |> List.map
+                            (\( position, normal ) ->
+                                ( Point3d.placeIn frame position
+                                , Vector3d.placeIn frame normal
+                                )
+                            )
+                        |> Array.fromList
+                , faceIndices = prependFaces 0 0 []
+                }
 
         PlanarSurface region sketchPlane ->
             let
@@ -1198,7 +1205,10 @@ surface3dToMesh tolerance (Surface3d isRightHanded surface3d) =
                     leftHandedFaceIndices =
                         List.map flipFaceOrientation rightHandedFaceIndices
                 in
-                Mesh.fromArray vertices leftHandedFaceIndices
+                Mesh.with
+                    { vertices = vertices
+                    , faceIndices = leftHandedFaceIndices
+                    }
 
 
 surface3dTranslateBy : Vector3d -> Surface3d -> Surface3d
@@ -1555,17 +1565,15 @@ regionToMesh tolerance region =
             let
                 ( p0, p1, p2, p3 ) =
                     Rectangle2d.vertices rectangle
-
-                vertexList =
-                    [ p0, p1, p2, p3 ]
-
-                faceIndices =
+            in
+            Mesh.with
+                { vertices = Array.fromList [ p0, p1, p2, p3 ]
+                , faceIndices =
                     if Frame2d.isRightHanded (Rectangle2d.axes rectangle) then
                         [ ( 0, 1, 2 ), ( 0, 2, 3 ) ]
                     else
                         [ ( 0, 2, 1 ), ( 0, 3, 2 ) ]
-            in
-            Mesh.fromList vertexList faceIndices
+                }
 
         ExtrusionRegion curve2d extrusionVector _ ->
             let
@@ -1590,9 +1598,6 @@ regionToMesh tolerance region =
                         _ ->
                             result
 
-                vertices =
-                    accumulate startVertices endVertices []
-
                 prependFaces columnIndex faces =
                     if columnIndex < numColumns then
                         let
@@ -1609,11 +1614,12 @@ regionToMesh tolerance region =
                             (faceIndices1 :: faceIndices2 :: faces)
                     else
                         faces
-
-                faceIndices =
-                    prependFaces 0 []
             in
-            Mesh.fromList vertices faceIndices
+            Mesh.with
+                { vertices =
+                    Array.fromList (accumulate startVertices endVertices [])
+                , faceIndices = prependFaces 0 []
+                }
 
         RevolutionRegion curve2d centerPoint sweptAngle _ ->
             let
@@ -1657,9 +1663,6 @@ regionToMesh tolerance region =
                                         (Point2d.rotateAround centerPoint angle)
                             )
 
-                vertices =
-                    List.concat (startVertices :: rotatedVertexLists)
-
                 numColumns =
                     List.length startVertices - 1
 
@@ -1695,11 +1698,13 @@ regionToMesh tolerance region =
                         prependFaces (rowIndex + 1) 0 faces
                     else
                         faces
-
-                faceIndices =
-                    prependFaces 0 0 []
             in
-            Mesh.fromList vertices faceIndices
+            Mesh.with
+                { vertices =
+                    Array.fromList
+                        (List.concat (startVertices :: rotatedVertexLists))
+                , faceIndices = prependFaces 0 0 []
+                }
 
         FanRegion point curve2d _ ->
             let
@@ -1711,11 +1716,12 @@ regionToMesh tolerance region =
 
                 toFaceIndices faceIndex =
                     ( 0, faceIndex + 1, faceIndex + 2 )
-
-                faceIndices =
-                    List.range 0 (numFaces - 1) |> List.map toFaceIndices
             in
-            Mesh.fromList (point :: curveVertices) faceIndices
+            Mesh.with
+                { vertices = Array.fromList (point :: curveVertices)
+                , faceIndices =
+                    List.range 0 (numFaces - 1) |> List.map toFaceIndices
+                }
 
         Fused regions ->
             Mesh.combine (List.map (regionToMesh tolerance) regions)

@@ -1827,8 +1827,10 @@ body3dExtrusion region sketchPlane distance =
             surface3dPlanar region sketchPlane
 
         extrusionVector =
-            Vector3d.withLength distance
-                (SketchPlane3d.normalDirection sketchPlane)
+            Vector3d.with
+                { length = distance
+                , direction = SketchPlane3d.normalDirection sketchPlane
+                }
 
         displacedSurface =
             surface3dTranslateBy extrusionVector planarSurface

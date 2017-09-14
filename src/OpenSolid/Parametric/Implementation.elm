@@ -399,7 +399,7 @@ curve2dToPolyline tolerance curve2d =
         points =
             parameterValues |> List.map (curve2dPointOn curve2d)
     in
-    Polyline2d.withVertices points
+    Polyline2d.fromVertices points
 
 
 curve2dSamples : Float -> Curve2d -> List ( Point2d, Vector2d )
@@ -772,7 +772,7 @@ curve3dToPolyline tolerance curve3d =
         points =
             parameterValues |> List.map (curve3dPointOn curve3d)
     in
-    Polyline3d.withVertices points
+    Polyline3d.fromVertices points
 
 
 curve3dSamples : Float -> Curve3d -> List ( Point3d, Vector3d )
@@ -844,7 +844,7 @@ surface3dPointOn (Surface3d _ surface) =
                     ( u, v ) =
                         Point2d.coordinates point
                 in
-                Point3d.withCoordinates
+                Point3d.fromCoordinates
                     ( x0 + u * xu + v * xv
                     , y0 + u * yu + v * yv
                     , z0 + u * zu + v * zv
@@ -1040,7 +1040,7 @@ surface3dToMesh tolerance (Surface3d isRightHanded surface3d) =
                             Point3d.coordinates point
 
                         uDerivative =
-                            Vector3d.withComponents
+                            Vector3d.fromComponents
                                 ( -sweptAngle * y
                                 , sweptAngle * x
                                 , 0
@@ -1078,12 +1078,12 @@ surface3dToMesh tolerance (Surface3d isRightHanded surface3d) =
                             ( nx, ny, nz ) =
                                 Vector3d.components normalVector
                         in
-                        ( Point3d.withCoordinates
+                        ( Point3d.fromCoordinates
                             ( x * cosAngle - y * sinAngle
                             , y * cosAngle + x * sinAngle
                             , z
                             )
-                        , Vector3d.withComponents
+                        , Vector3d.fromComponents
                             ( nx * cosAngle - ny * sinAngle
                             , ny * cosAngle + nx * sinAngle
                             , nz
@@ -1394,7 +1394,7 @@ regionBoundaries region =
                         Exterior ->
                             let
                                 lineSegment =
-                                    LineSegment2d.withEndpoints
+                                    LineSegment2d.fromEndpoints
                                         ( startPoint
                                         , Point2d.translateBy
                                             extrusionVector
@@ -1411,7 +1411,7 @@ regionBoundaries region =
                         Exterior ->
                             let
                                 lineSegment =
-                                    LineSegment2d.withEndpoints
+                                    LineSegment2d.fromEndpoints
                                         ( Point2d.translateBy
                                             extrusionVector
                                             endPoint
@@ -1519,7 +1519,7 @@ regionBoundaries region =
                         Exterior ->
                             let
                                 lineSegment =
-                                    LineSegment2d.withEndpoints
+                                    LineSegment2d.fromEndpoints
                                         ( point, curve2dStartPoint curve2d )
                             in
                             Just (LineSegment2dCurve lineSegment)
@@ -1532,7 +1532,7 @@ regionBoundaries region =
                         Exterior ->
                             let
                                 lineSegment =
-                                    LineSegment2d.withEndpoints
+                                    LineSegment2d.fromEndpoints
                                         ( curve2dEndPoint curve2d, point )
                             in
                             Just (LineSegment2dCurve lineSegment)

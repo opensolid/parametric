@@ -1187,7 +1187,7 @@ surface3dToMesh tolerance (Surface3d isRightHanded surface3d) =
                     )
 
                 rightHandedMesh =
-                    regionToMesh tolerance region |> Mesh.map toVertex3d
+                    regionToMesh tolerance region |> Mesh.mapVertices toVertex3d
             in
             if isRightHanded then
                 rightHandedMesh

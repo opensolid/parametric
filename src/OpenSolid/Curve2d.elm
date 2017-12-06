@@ -29,8 +29,7 @@ import OpenSolid.Axis2d as Axis2d exposing (Axis2d)
 import OpenSolid.CubicSpline2d as CubicSpline2d exposing (CubicSpline2d)
 import OpenSolid.Frame2d as Frame2d exposing (Frame2d)
 import OpenSolid.LineSegment2d as LineSegment2d exposing (LineSegment2d)
-import OpenSolid.Parametric.Implementation as Implementation
-import OpenSolid.Parametric.Types as Types exposing (..)
+import OpenSolid.Parametric.Curve as Curve
 import OpenSolid.Point2d as Point2d exposing (Point2d)
 import OpenSolid.Polyline2d as Polyline2d exposing (Polyline2d)
 import OpenSolid.QuadraticSpline2d as QuadraticSpline2d exposing (QuadraticSpline2d)
@@ -38,77 +37,77 @@ import OpenSolid.Vector2d as Vector2d exposing (Vector2d)
 
 
 type alias Curve2d =
-    Types.Curve2d
+    Curve.Curve2d
 
 
 lineSegment : LineSegment2d -> Curve2d
 lineSegment =
-    Implementation.LineSegment2dCurve
+    Curve.LineSegment2dCurve
 
 
 arc : Arc2d -> Curve2d
 arc =
-    Implementation.Arc2dCurve
+    Curve.Arc2dCurve
 
 
 cubicSpline : CubicSpline2d -> Curve2d
 cubicSpline =
-    Implementation.CubicSpline2dCurve
+    Curve.CubicSpline2dCurve
 
 
 quadraticSpline : QuadraticSpline2d -> Curve2d
 quadraticSpline =
-    Implementation.QuadraticSpline2dCurve
+    Curve.QuadraticSpline2dCurve
 
 
 pointOn : Curve2d -> Float -> Point2d
 pointOn =
-    Implementation.curve2dPointOn
+    Curve.pointOn2d
 
 
 relativeTo : Frame2d -> Curve2d -> Curve2d
 relativeTo =
-    Implementation.curve2dRelativeTo
+    Curve.relativeTo2d
 
 
 placeIn : Frame2d -> Curve2d -> Curve2d
 placeIn =
-    Implementation.curve2dPlaceIn
+    Curve.placeIn2d
 
 
 toPolyline : Float -> Curve2d -> Polyline2d
 toPolyline =
-    Implementation.curve2dToPolyline
+    Curve.toPolyline2d
 
 
 translateBy : Vector2d -> Curve2d -> Curve2d
 translateBy =
-    Implementation.curve2dTranslateBy
+    Curve.translateBy2d
 
 
 rotateAround : Point2d -> Float -> Curve2d -> Curve2d
 rotateAround =
-    Implementation.curve2dRotateAround
+    Curve.rotateAround2d
 
 
 mirrorAcross : Axis2d -> Curve2d -> Curve2d
 mirrorAcross =
-    Implementation.curve2dMirrorAcross
+    Curve.mirrorAcross2d
 
 
 startPoint : Curve2d -> Point2d
 startPoint =
-    Implementation.curve2dStartPoint
+    Curve.startPoint2d
 
 
 endPoint : Curve2d -> Point2d
 endPoint =
-    Implementation.curve2dEndPoint
+    Curve.endPoint2d
 
 
 reverse : Curve2d -> Curve2d
 reverse =
-    Implementation.curve2dReverse
+    Curve.reverse2d
 
 
 type Matcher a
@@ -182,16 +181,16 @@ otherwise fallback (Matcher cases) =
     in
     \curve ->
         case curve of
-            Implementation.LineSegment2dCurve lineSegment ->
+            Curve.LineSegment2dCurve lineSegment ->
                 handleLineSegment lineSegment curve
 
-            Implementation.Arc2dCurve arc ->
+            Curve.Arc2dCurve arc ->
                 handleArc arc curve
 
-            Implementation.QuadraticSpline2dCurve quadraticSpline ->
+            Curve.QuadraticSpline2dCurve quadraticSpline ->
                 handleQuadraticSpline quadraticSpline curve
 
-            Implementation.CubicSpline2dCurve cubicSpline ->
+            Curve.CubicSpline2dCurve cubicSpline ->
                 handleCubicSpline cubicSpline curve
 
             _ ->

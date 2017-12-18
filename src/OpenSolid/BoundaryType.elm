@@ -1,4 +1,4 @@
-module OpenSolid.BoundaryType exposing (exterior, interior)
+module OpenSolid.BoundaryType exposing (BoundaryType, exterior, interior)
 
 import OpenSolid.Parametric.Implementation as Implementation
 import OpenSolid.Parametric.Types as Types

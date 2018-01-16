@@ -891,7 +891,7 @@ surface3dPointOn (Surface3d _ surface) =
                     y =
                         y0 * cosTheta + x0 * sinTheta
                 in
-                Point3d.in_ frame ( x, y, z )
+                Point3d.fromCoordinatesIn frame ( x, y, z )
 
         PlanarSurface _ sketchPlane ->
             -- TODO: interpolate within region bounding box?

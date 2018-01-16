@@ -39,12 +39,12 @@ type alias Region2d =
 
 rectangle : { minX : Float, maxX : Float, minY : Float, maxY : Float } -> Region2d
 rectangle extrema =
-    fromRectangle (Rectangle2d.with extrema)
+    fromRectangle (Rectangle2d.fromExtrema extrema)
 
 
 rectangleWith : { left : BoundaryType, right : BoundaryType, top : BoundaryType, bottom : BoundaryType } -> { minX : Float, maxX : Float, minY : Float, maxY : Float } -> Region2d
 rectangleWith edgeTypes extrema =
-    fromRectangleWith edgeTypes (Rectangle2d.with extrema)
+    fromRectangleWith edgeTypes (Rectangle2d.fromExtrema extrema)
 
 
 fromRectangle : Rectangle2d -> Region2d
@@ -148,23 +148,26 @@ roundedRectangle rectangle cornerRadius =
         halfHeight =
             height / 2
 
-        frame =
+        localFrame =
             Rectangle2d.axes rectangle
 
         xAxis =
-            Frame2d.xAxis frame
+            Frame2d.xAxis localFrame
 
         yAxis =
-            Frame2d.yAxis frame
+            Frame2d.yAxis localFrame
 
         cornerCenter =
-            Point2d.in_ frame
+            Point2d.fromCoordinatesIn localFrame
                 ( halfWidth - cornerRadius
                 , halfHeight - cornerRadius
                 )
 
         cornerStart =
-            Point2d.in_ frame ( halfWidth, halfHeight - cornerRadius )
+            Point2d.fromCoordinatesIn localFrame
+                ( halfWidth
+                , halfHeight - cornerRadius
+                )
 
         topRightCorner =
             revolutionWith
@@ -186,7 +189,7 @@ roundedRectangle rectangle cornerRadius =
                 , top = BoundaryType.interior
                 , bottom = BoundaryType.interior
                 }
-                (Rectangle2d.in_ frame
+                (Rectangle2d.fromExtremaIn localFrame
                     { minX = halfWidth - cornerRadius
                     , maxX = halfWidth
                     , minY = -halfHeight + cornerRadius
@@ -201,7 +204,7 @@ roundedRectangle rectangle cornerRadius =
                 , top = BoundaryType.exterior
                 , bottom = BoundaryType.interior
                 }
-                (Rectangle2d.in_ frame
+                (Rectangle2d.fromExtremaIn localFrame
                     { minX = -halfWidth + cornerRadius
                     , maxX = halfWidth - cornerRadius
                     , minY = halfHeight - cornerRadius
@@ -231,7 +234,7 @@ roundedRectangle rectangle cornerRadius =
                 , top = BoundaryType.interior
                 , bottom = BoundaryType.interior
                 }
-                (Rectangle2d.in_ frame
+                (Rectangle2d.fromExtremaIn localFrame
                     { minX = -halfWidth + cornerRadius
                     , maxX = halfWidth - cornerRadius
                     , minY = -halfHeight + cornerRadius
